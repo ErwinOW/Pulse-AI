@@ -50,9 +50,13 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 ## Known issues
 - `StarletteDeprecationWarning`: Starlette suggests replacing `httpx` for its TestClient. Warning only; tests pass. Revisit before deployment — do not swap packages without checking the official Starlette changelog.
 
+- [x] 1.1 Event schema (`backend/app/schema/`) — 11 event types, match consistency checks — **26 passed** (2026-10-17)
+- [ ] 1.2 Phase-based simulator + demo/balanced scenarios + ground truth (`backend/app/simulator/`, `data/matches/`)
+
 ## Notes
 - In dev, `/api/health` is requested twice per page load: React StrictMode intentionally runs effects twice in development only.
 - npm 12 is available; staying on npm 11.19.1 until after the hackathon.
 
 ## Next actions
-- Phase 1: event schema (Pydantic) + validation tests
+- Verify simulator tests; inspect generated demo match
+- Phase 2: statistics engine

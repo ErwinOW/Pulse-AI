@@ -1,0 +1,75 @@
+{
+  "match_id": "demo-high-press",
+  "scenario": "high_press_turning_point",
+  "seed": 42,
+  "is_synthetic": true,
+  "tactical_shifts": [
+    {
+      "kind": "pressing_increase",
+      "team_id": "EAS",
+      "start_s": 3300,
+      "end_s": 4200,
+      "description": "Eastvale presses high; Northbridge build-up is disrupted."
+    }
+  ],
+  "false_alarms": [
+    {
+      "kind": "pressing_burst",
+      "team_id": "EAS",
+      "start_s": 1200,
+      "end_s": 1380,
+      "description": "Three-minute pressing burst that fades; should NOT trigger an alert."
+    }
+  ],
+  "low_activity": [
+    {
+      "start_s": 4800,
+      "end_s": 5400
+    }
+  ],
+  "expected_alerts": [
+    {
+      "kind": "pressing_increase",
+      "team_id": "EAS",
+      "earliest_s": 3300,
+      "latest_s": 3900
+    }
+  ],
+  "limitations": [
+    "Synthetic data: patterns exist because they were planted, not discovered.",
+    "No player-tracking data: pressing is approximated from pressure events and turnover locations.",
+    "Simplified event set: no throw-ins, goal kicks, offsides, or aerial duels.",
+    "Open-play shots are never goals; all goals are scripted sequences."
+  ],
+  "goals": [
+    {
+      "event_id": "demo-high-press-e0605",
+      "team_id": "NBR",
+      "timestamp_seconds": 2061.4,
+      "build_up": "patient_possession",
+      "sequence_event_ids": [
+        "demo-high-press-e0600",
+        "demo-high-press-e0601",
+        "demo-high-press-e0602",
+        "demo-high-press-e0603",
+        "demo-high-press-e0604",
+        "demo-high-press-e0605"
+      ]
+    },
+    {
+      "event_id": "demo-high-press-e1132",
+      "team_id": "EAS",
+      "timestamp_seconds": 3809.7,
+      "build_up": "high_turnover",
+      "sequence_event_ids": [
+        "demo-high-press-e1126",
+        "demo-high-press-e1127",
+        "demo-high-press-e1128",
+        "demo-high-press-e1129",
+        "demo-high-press-e1130",
+        "demo-high-press-e1131",
+        "demo-high-press-e1132"
+      ]
+    }
+  ]
+}

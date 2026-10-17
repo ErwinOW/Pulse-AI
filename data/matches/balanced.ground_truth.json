@@ -1,0 +1,46 @@
+{
+  "match_id": "balanced",
+  "scenario": "balanced_no_shift",
+  "seed": 7,
+  "is_synthetic": true,
+  "tactical_shifts": [],
+  "false_alarms": [],
+  "low_activity": [],
+  "expected_alerts": [],
+  "limitations": [
+    "Synthetic data: patterns exist because they were planted, not discovered.",
+    "No player-tracking data: pressing is approximated from pressure events and turnover locations.",
+    "Simplified event set: no throw-ins, goal kicks, offsides, or aerial duels.",
+    "Open-play shots are never goals; all goals are scripted sequences."
+  ],
+  "goals": [
+    {
+      "event_id": "balanced-e0497",
+      "team_id": "EAS",
+      "timestamp_seconds": 1521.3,
+      "build_up": "patient_possession",
+      "sequence_event_ids": [
+        "balanced-e0492",
+        "balanced-e0493",
+        "balanced-e0494",
+        "balanced-e0495",
+        "balanced-e0496",
+        "balanced-e0497"
+      ]
+    },
+    {
+      "event_id": "balanced-e1221",
+      "team_id": "NBR",
+      "timestamp_seconds": 4118.1,
+      "build_up": "patient_possession",
+      "sequence_event_ids": [
+        "balanced-e1216",
+        "balanced-e1217",
+        "balanced-e1218",
+        "balanced-e1219",
+        "balanced-e1220",
+        "balanced-e1221"
+      ]
+    }
+  ]
+}
