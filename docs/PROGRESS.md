@@ -43,10 +43,16 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - [x] 0.4 Repo created at `C:\dev\pulse` (branch `main`)
 - [x] 0.5 Backend venv + core packages
 - [x] 0.6 Health endpoint + first test — **1 passed** (2026-10-17)
+- [x] 0.7 First commit `03004f3`; `.gitattributes` added to normalize line endings (LF)
+- [x] 0.8 Frontend scaffold: create-vite 9.2.1, React 19, TypeScript 6, Vite 8.3.4, ESLint 10 — build OK, 0 vulnerabilities
+- [x] 0.9 Vite `/api` proxy → FastAPI; status page shows "Backend connected" (backend logged `GET /api/health 200`)
 
 ## Known issues
 - `StarletteDeprecationWarning`: Starlette suggests replacing `httpx` for its TestClient. Warning only; tests pass. Revisit before deployment — do not swap packages without checking the official Starlette changelog.
 
+## Notes
+- In dev, `/api/health` is requested twice per page load: React StrictMode intentionally runs effects twice in development only.
+- npm 12 is available; staying on npm 11.19.1 until after the hackathon.
+
 ## Next actions
-- First Git commit
-- Frontend scaffold (React + TS + Vite)
+- Phase 1: event schema (Pydantic) + validation tests
