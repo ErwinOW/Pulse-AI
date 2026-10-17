@@ -42,8 +42,8 @@ DEFINITIONS: dict[str, str] = {
     "was lost to a tackle.",
     "shots": "Shot attempts.",
     "shots_on_target": "Shots with outcome goal or saved.",
-    "box_entries": "Completed passes or carries ending in the approximate penalty area "
-    "(x >= 83, 21 <= y <= 79).",
+    "box_entries": "Completed passes or carries that move the ball from outside into the "
+    "approximate penalty area (x >= 83, 21 <= y <= 79).",
     "pressures_per_min": "Pressure events per minute (estimate; no tracking data).",
     "high_pressures_per_min": "Pressure events per minute located at x >= 60 in the presser's "
     "frame, i.e. in the opponent's build-up area (estimate).",
@@ -90,12 +90,17 @@ def _percent(part: int, whole: int) -> float | None:
     return round(100 * part / whole, 1) if whole else None
 
 
+def _in_box(x: float, y: float) -> bool:
+    return x >= BOX_MIN_X and BOX_Y_RANGE[0] <= y <= BOX_Y_RANGE[1]
+
+
 def _is_box_entry(event: Event) -> bool:
+    """Completed pass or carry that moves the ball from outside the box into it."""
     if isinstance(event, PassEvent) and event.outcome != "complete":
         return False
     if not isinstance(event, (PassEvent, CarryEvent)):
         return False
-    return event.end_x >= BOX_MIN_X and BOX_Y_RANGE[0] <= event.end_y <= BOX_Y_RANGE[1]
+    return _in_box(event.end_x, event.end_y) and not _in_box(event.start_x, event.start_y)
 
 
 def _is_final_third_pass(event: Event) -> bool:

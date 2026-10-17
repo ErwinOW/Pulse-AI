@@ -15,31 +15,31 @@
   ],
   "goals": [
     {
-      "event_id": "balanced-e0497",
+      "event_id": "balanced-e0476",
       "team_id": "EAS",
-      "timestamp_seconds": 1521.3,
+      "timestamp_seconds": 1528.2,
       "build_up": "patient_possession",
       "sequence_event_ids": [
-        "balanced-e0492",
-        "balanced-e0493",
-        "balanced-e0494",
-        "balanced-e0495",
-        "balanced-e0496",
-        "balanced-e0497"
+        "balanced-e0471",
+        "balanced-e0472",
+        "balanced-e0473",
+        "balanced-e0474",
+        "balanced-e0475",
+        "balanced-e0476"
       ]
     },
     {
-      "event_id": "balanced-e1221",
+      "event_id": "balanced-e1395",
       "team_id": "NBR",
-      "timestamp_seconds": 4118.1,
+      "timestamp_seconds": 4154.0,
       "build_up": "patient_possession",
       "sequence_event_ids": [
-        "balanced-e1216",
-        "balanced-e1217",
-        "balanced-e1218",
-        "balanced-e1219",
-        "balanced-e1220",
-        "balanced-e1221"
+        "balanced-e1390",
+        "balanced-e1391",
+        "balanced-e1392",
+        "balanced-e1393",
+        "balanced-e1394",
+        "balanced-e1395"
       ]
     }
   ]

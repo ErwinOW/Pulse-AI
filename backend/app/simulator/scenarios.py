@@ -14,19 +14,19 @@ EASTVALE = TeamSpec(team_id="EAS", name="Eastvale Athletic", short_name="EAS", n
 # --- Team styles --------------------------------------------------------------
 
 # Northbridge: patient, possession-heavy build-up.
-NBR_BASE = TeamStyle(pass_success=0.86, progression=5.5, carry_rate=0.2, shot_rate=0.22,
+NBR_BASE = TeamStyle(pass_success=0.86, progression=5.5, carry_rate=0.2, shot_rate=0.12,
                      press_rate=0.08, high_press_rate=0.05)
 # Eastvale: more direct, mid-block by default.
-EAS_BASE = TeamStyle(pass_success=0.79, progression=7.5, carry_rate=0.25, shot_rate=0.25,
+EAS_BASE = TeamStyle(pass_success=0.79, progression=7.5, carry_rate=0.25, shot_rate=0.14,
                      press_rate=0.10, high_press_rate=0.05)
 # Short pressing burst that fades (false alarm).
 EAS_BURST = replace(EAS_BASE, press_rate=0.15, high_press_rate=0.35)
 # Sustained high press (the planted tactical shift).
 EAS_HIGH_PRESS = replace(EAS_BASE, press_rate=0.18, high_press_rate=0.50)
 # Closing minutes: slower, safer, fewer chances.
-NBR_LOW = replace(NBR_BASE, progression=4.0, shot_rate=0.12, press_rate=0.05, high_press_rate=0.0,
+NBR_LOW = replace(NBR_BASE, progression=4.0, shot_rate=0.07, press_rate=0.05, high_press_rate=0.0,
                   tempo=1.6)
-EAS_LOW = replace(EAS_BASE, progression=4.0, shot_rate=0.12, press_rate=0.05, high_press_rate=0.0,
+EAS_LOW = replace(EAS_BASE, progression=4.0, shot_rate=0.07, press_rate=0.05, high_press_rate=0.0,
                   tempo=1.6)
 
 COMMON_LIMITATIONS = [
@@ -90,7 +90,7 @@ DEMO_HIGH_PRESS = Scenario(
 
 # --- Balanced match: no tactical shift (false-alarm control) ---------------------
 
-BALANCED_STYLE = TeamStyle(pass_success=0.82, progression=6.5, carry_rate=0.22, shot_rate=0.23,
+BALANCED_STYLE = TeamStyle(pass_success=0.82, progression=6.5, carry_rate=0.22, shot_rate=0.13,
                            press_rate=0.10, high_press_rate=0.06)
 
 BALANCED = Scenario(

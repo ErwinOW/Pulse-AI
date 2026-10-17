@@ -43,32 +43,32 @@
   ],
   "goals": [
     {
-      "event_id": "demo-high-press-e0605",
+      "event_id": "demo-high-press-e0695",
       "team_id": "NBR",
-      "timestamp_seconds": 2061.4,
+      "timestamp_seconds": 2085.3,
       "build_up": "patient_possession",
       "sequence_event_ids": [
-        "demo-high-press-e0600",
-        "demo-high-press-e0601",
-        "demo-high-press-e0602",
-        "demo-high-press-e0603",
-        "demo-high-press-e0604",
-        "demo-high-press-e0605"
+        "demo-high-press-e0690",
+        "demo-high-press-e0691",
+        "demo-high-press-e0692",
+        "demo-high-press-e0693",
+        "demo-high-press-e0694",
+        "demo-high-press-e0695"
       ]
     },
     {
-      "event_id": "demo-high-press-e1132",
+      "event_id": "demo-high-press-e1303",
       "team_id": "EAS",
-      "timestamp_seconds": 3809.7,
+      "timestamp_seconds": 3813.7,
       "build_up": "high_turnover",
       "sequence_event_ids": [
-        "demo-high-press-e1126",
-        "demo-high-press-e1127",
-        "demo-high-press-e1128",
-        "demo-high-press-e1129",
-        "demo-high-press-e1130",
-        "demo-high-press-e1131",
-        "demo-high-press-e1132"
+        "demo-high-press-e1297",
+        "demo-high-press-e1298",
+        "demo-high-press-e1299",
+        "demo-high-press-e1300",
+        "demo-high-press-e1301",
+        "demo-high-press-e1302",
+        "demo-high-press-e1303"
       ]
     }
   ]

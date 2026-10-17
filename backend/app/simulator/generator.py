@@ -246,13 +246,17 @@ class _Generator:
                     self.t += self.rng.uniform(5, 12)  # free kick taken; attacker keeps the ball
                     continue
 
-            # Shot
-            if x >= 78 and self.rng.random() < att.shot_rate:
+            # Shot: 40% of the team's shot rate at x = 78, full rate from x = 90.
+            shot_chance = att.shot_rate * min(1.0, (x - 70) / 20)
+            if x >= 78 and self.rng.random() < shot_chance:
                 outcome = self.rng.choices(["saved", "off_target", "blocked"], weights=[35, 40, 25])[0]
                 self._emit("shot", period, self._action_dt(side), team_id=self.team_id[side],
                            player_id=holder, start_x=x, start_y=y,
                            outcome=outcome, under_pressure=pressured)
-                return (opp, 8.0, _clip(self.rng.uniform(30, 70)), None), True
+                # Goal kick / keeper distribution. Restarting right by the goal (x ~ 8) created a
+                # feedback loop: deep turnover -> opponent regains in the box -> another shot.
+                restart_x = _clip(self.rng.uniform(15, 35))
+                return (opp, restart_x, _clip(self.rng.uniform(30, 70)), None), True
 
             # Carry
             if self.rng.random() < att.carry_rate:
@@ -271,10 +275,7 @@ class _Generator:
 
             # Pass
             success = att.pass_success - (PRESS_PENALTY if pressured else 0.0)
-            if action == MAX_ACTIONS_PER_CHAIN - 1:
-                success = 0.0  # safety valve: end overly long chains
-            end_x = _clip(x + self.rng.gauss(att.progression, 8))
-            end_y = _clip(y + self.rng.gauss(0, 15))
+            end_x, end_y = self._pass_target(att, x, y)
             roll = self.rng.random()
 
             if roll < success:
@@ -289,15 +290,32 @@ class _Generator:
                 rx, ry = _mirror(end_x, end_y)
                 return (opp, rx, _clip(ry, 2, 98), None), True
 
-            self._pass(side, period, x, y, end_x, end_y, "incomplete", pressured, holder)
-            rx, ry = _mirror(end_x, end_y)
-            kind = "interception" if self.rng.random() < 0.4 else "ball_recovery"
-            winner = self._pick(opp, rx)
-            self._emit(kind, period, self.rng.uniform(0.5, 1.5), team_id=self.team_id[opp],
-                       player_id=winner, start_x=rx, start_y=ry)
-            return (opp, rx, ry, winner), False
+            return self._lose_ball(side, period, x, y, end_x, end_y, pressured, holder), False
 
-        raise AssertionError("unreachable: the last action always ends the chain")
+        # Safety valve: a possession that reaches the action limit ends with a misplaced pass,
+        # whatever the last action was.
+        end_x, end_y = self._pass_target(self._style(side), x, y)
+        return self._lose_ball(side, period, x, y, end_x, end_y, False, holder), False
+
+    def _pass_target(self, style: TeamStyle, x: float, y: float) -> tuple[float, float]:
+        # Forward gain shrinks near goal (full at midfield, ~0 at x = 92, slightly backwards
+        # beyond), so attacks circulate around the box instead of piling up at the goal line.
+        # y drifts back towards the centre so play does not get stuck in a corner.
+        gain_factor = max(-0.3, min(1.0, (92 - x) / 42))
+        end_x = _clip(x + self.rng.gauss(style.progression * gain_factor, 8))
+        end_y = _clip(y + self.rng.gauss((50 - y) * 0.3, 15))
+        return end_x, end_y
+
+    def _lose_ball(self, side, period, x, y, end_x, end_y, pressured, holder):
+        """Misplaced pass won by the opponent. Returns the opponent's restart tuple."""
+        opp = _other(side)
+        self._pass(side, period, x, y, end_x, end_y, "incomplete", pressured, holder)
+        rx, ry = _mirror(end_x, end_y)
+        kind = "interception" if self.rng.random() < 0.4 else "ball_recovery"
+        winner = self._pick(opp, rx)
+        self._emit(kind, period, self.rng.uniform(0.5, 1.5), team_id=self.team_id[opp],
+                   player_id=winner, start_x=rx, start_y=ry)
+        return opp, rx, ry, winner
 
     # -- scripted moments -------------------------------------------------------
 

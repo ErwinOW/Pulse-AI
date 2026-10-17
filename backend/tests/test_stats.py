@@ -156,6 +156,7 @@ def test_box_entries():
         pass_(2, A, ex=85, ey=10),  # no: wide of the box
         pass_(3, A, ex=90, ey=50, outcome="incomplete"),  # no: not completed
         carry(4, A, sx=78, ex=84, ey=30),  # yes
+        pass_(5, A, sx=85, sy=50, ex=90, ey=45),  # no: already inside the box
     ]
 
     assert stats(events).teams[A].box_entries.value == 2

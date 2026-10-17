@@ -7,6 +7,7 @@ detector tests would be meaningless.
 
 from dataclasses import replace
 from functools import cache
+from pathlib import Path
 
 import pytest
 
@@ -155,6 +156,46 @@ def test_demo_low_activity_period_is_quieter():
     match, _ = generated("demo-high-press")
 
     assert events_per_minute(match, 4800, 5400) < 0.75 * events_per_minute(match, 0, 4800)
+
+
+def shots_by_team(match: Match) -> dict[str, int]:
+    counts = {match.home.team_id: 0, match.away.team_id: 0}
+    for e in match.events:
+        if isinstance(e, ShotEvent):
+            counts[e.team_id] += 1
+    return counts
+
+
+# --- Realism and bias guards ------------------------------------------------------
+
+
+@pytest.mark.parametrize("match_id", ["demo-high-press", "balanced"])
+def test_shot_totals_are_football_realistic(match_id):
+    match, _ = generated(match_id)
+
+    for team_id, shots in shots_by_team(match).items():
+        assert 5 <= shots <= 22, f"{team_id} took {shots} shots"
+
+
+def test_balanced_scenario_has_no_home_away_bias():
+    # One match can be lopsided by chance; across 20 seeds identical styles must even out.
+    home = away = 0
+    for seed in range(1, 21):
+        match, _ = generate(replace(BALANCED, seed=seed))
+        counts = shots_by_team(match)
+        home += counts[match.home.team_id]
+        away += counts[match.away.team_id]
+
+    assert abs(home - away) <= 0.15 * max(home, away), f"home {home} vs away {away} shots"
+
+
+@pytest.mark.parametrize("match_id", ["demo-high-press", "balanced"])
+def test_committed_fixture_matches_generator(match_id):
+    # Guards against a stale demo: rerun `python -m scripts.generate_matches` if this fails.
+    fixture = Path(__file__).resolve().parents[2] / "data" / "matches" / f"{match_id}.json"
+    match, _ = generated(match_id)
+
+    assert Match.model_validate_json(fixture.read_text(encoding="utf-8")) == match
 
 
 def test_balanced_match_has_no_pressing_shift():
