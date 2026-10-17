@@ -1,0 +1,6 @@
+# PULSE backend dependencies (Phase 0: core only; AI libraries are added on day 5)
+fastapi>=0.115          # web API + WebSocket server
+uvicorn[standard]>=0.30 # ASGI server that runs FastAPI
+pydantic>=2.7           # event schema validation (also a FastAPI dependency)
+pytest>=8.0             # unit tests
+httpx>=0.27             # needed by FastAPI's TestClient in tests

@@ -1,0 +1,25 @@
+# --- Secrets (API keys, tokens) — never commit ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Node / frontend ---
+node_modules/
+dist/
+*.log
+
+# --- Editors / OS ---
+.vscode/*
+!.vscode/settings.json
+.idea/
+Thumbs.db
+.DS_Store
