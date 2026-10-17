@@ -19,8 +19,9 @@ def main() -> None:
 
         match_path = OUTPUT_DIR / f"{match_id}.json"
         truth_path = OUTPUT_DIR / f"{match_id}.ground_truth.json"
-        match_path.write_text(match.model_dump_json(indent=2) + "\n", encoding="utf-8")
-        truth_path.write_text(json.dumps(ground_truth, indent=2) + "\n", encoding="utf-8")
+        # newline="\n": write LF on Windows too, matching .gitattributes.
+        match_path.write_text(match.model_dump_json(indent=2) + "\n", encoding="utf-8", newline="\n")
+        truth_path.write_text(json.dumps(ground_truth, indent=2) + "\n", encoding="utf-8", newline="\n")
 
         goals = ", ".join(
             f"{g['team_id']} {g['timestamp_seconds'] / 60:.0f}'" for g in ground_truth["goals"]

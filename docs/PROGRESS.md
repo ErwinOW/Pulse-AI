@@ -51,7 +51,8 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - `StarletteDeprecationWarning`: Starlette suggests replacing `httpx` for its TestClient. Warning only; tests pass. Revisit before deployment — do not swap packages without checking the official Starlette changelog.
 
 - [x] 1.1 Event schema (`backend/app/schema/`) — 11 event types, match consistency checks — **26 passed** (2026-10-17)
-- [ ] 1.2 Phase-based simulator + demo/balanced scenarios + ground truth (`backend/app/simulator/`, `data/matches/`)
+- [x] 1.2 Phase-based simulator + demo/balanced scenarios + ground truth — **43 passed**; demo 1,540 events, goals NBR 34' / EAS 63'; commit `550bf7c`
+- [x] 2.1 Statistics engine (`backend/app/stats/`): turnovers, possession share, pass %, shots, box entries, pressure rates, momentum, rolling windows — **64 passed**
 
 ## Notes
 - In dev, `/api/health` is requested twice per page load: React StrictMode intentionally runs effects twice in development only.
