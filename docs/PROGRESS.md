@@ -46,18 +46,20 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - [x] 0.7 First commit `03004f3`; `.gitattributes` added to normalize line endings (LF)
 - [x] 0.8 Frontend scaffold: create-vite 9.2.1, React 19, TypeScript 6, Vite 8.3.4, ESLint 10 — build OK, 0 vulnerabilities
 - [x] 0.9 Vite `/api` proxy → FastAPI; status page shows "Backend connected" (backend logged `GET /api/health 200`)
+- [x] 1.1 Event schema (`backend/app/schema/`) — 11 event types, match consistency checks — **26 passed**; commit `0e0f9ed`
+- [x] 1.2 Phase-based simulator + demo/balanced scenarios + ground truth — **43 passed**; commit `550bf7c`
+- [x] 2.1 Statistics engine (`backend/app/stats/`): turnovers, possession share, pass %, shots, box entries, pressure rates, momentum, rolling windows — **64 passed**; commit `a792954`
+- [x] 2.2 Realism fixes (restarts, final-third circulation, shot chance, outside→inside box entries) — **69 passed**; commit `c432a39`. Demo now: 1,717 events, goals NBR 35' / EAS 64', shots 17 / 16
 
 ## Known issues
+- Balanced fixture (seed 7) is uneven for one match (possession 56/44, shots 21 vs 12); 20-seed test shows no systematic bias. Kept to avoid cherry-picking; simulator possessions are streakier than real football.
 - `StarletteDeprecationWarning`: Starlette suggests replacing `httpx` for its TestClient. Warning only; tests pass. Revisit before deployment — do not swap packages without checking the official Starlette changelog.
-
-- [x] 1.1 Event schema (`backend/app/schema/`) — 11 event types, match consistency checks — **26 passed** (2026-10-17)
-- [x] 1.2 Phase-based simulator + demo/balanced scenarios + ground truth — **43 passed**; demo 1,540 events, goals NBR 34' / EAS 63'; commit `550bf7c`
-- [x] 2.1 Statistics engine (`backend/app/stats/`): turnovers, possession share, pass %, shots, box entries, pressure rates, momentum, rolling windows — **64 passed**
 
 ## Notes
 - In dev, `/api/health` is requested twice per page load: React StrictMode intentionally runs effects twice in development only.
 - npm 12 is available; staying on npm 11.19.1 until after the hackathon.
 
-## Next actions
-- Verify simulator tests; inspect generated demo match
-- Phase 2: statistics engine
+## Next actions (resume here)
+- Push repo to GitHub (off-machine backup; can stay private until submission)
+- Approve + build pressing-increase detector (design proposed 2026-10-17: 2-of-3 signals, 5-min recent vs 15-min baseline, 2 consecutive minutes, dedup; evaluate on 10 extra seeds per scenario)
+- Sign up for Azure free account before ~Oct 24 (30-day credit must cover judging to Nov 10)
