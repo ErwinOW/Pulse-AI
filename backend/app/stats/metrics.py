@@ -112,11 +112,21 @@ def _is_final_third_pass(event: Event) -> bool:
 
 
 def compute_window(
-    events: Sequence[Event], team_ids: tuple[str, str], start_s: float, end_s: float
+    events: Sequence[Event],
+    team_ids: tuple[str, str],
+    start_s: float,
+    end_s: float,
+    all_turnovers: Sequence[Turnover] | None = None,
 ) -> WindowStats:
-    """Metrics for each team over events with start_s <= timestamp < end_s."""
+    """Metrics for each team over events with start_s <= timestamp < end_s.
+
+    `all_turnovers` lets callers that compute many windows (the detector) pass
+    find_turnovers() once instead of re-deriving it for every window.
+    """
     in_window = [e for e in events if start_s <= e.timestamp_seconds < end_s]
-    turnovers = [t for t in find_turnovers(events, team_ids) if start_s <= t.timestamp_seconds < end_s]
+    if all_turnovers is None:
+        all_turnovers = find_turnovers(events, team_ids)
+    turnovers = [t for t in all_turnovers if start_s <= t.timestamp_seconds < end_s]
     minutes = (end_s - start_s) / 60
     total_on_ball = sum(1 for e in in_window if e.event_type in ON_BALL_TYPES)
 
