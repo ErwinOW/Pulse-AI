@@ -24,8 +24,8 @@ Specification: [`PULSE_Project_Brief.md`](../PULSE_Project_Brief.md)
 | Frontend | React + TypeScript + Vite + Recharts | |
 | Streaming | WebSocket timed replay | |
 | Storage | JSON fixtures | SQLite only if needed |
-| AI | Microsoft Agent Framework; GitHub Models (dev), Azure Foundry (demo) | Added day 5; LLM never computes stats |
-| Hosting | Azure free account | |
+| AI | Microsoft Agent Framework + **Google Gemini free tier** (no card) | GitHub Models retired 2026-07-30; Azure declined (card required). Groq only if Gemini limits are hit. LLM never computes stats |
+| Hosting | Free, no-card host (TBD at deploy time) | Azure declined |
 | Languages | English, Indonesian | |
 | Budget | ≈ $10 | |
 | Scope | P0 only; Feature G / counterfactuals / tactical pitch cut unless ahead on Oct 24 | Recap is first add-back |
@@ -70,4 +70,6 @@ GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be publi
 
 ## Next actions (resume here)
 - Approve + build pressing-increase detector (design proposed 2026-10-17: 2-of-3 signals, 5-min recent vs 15-min baseline, 2 consecutive minutes, dedup; evaluate on 10 extra seeds per scenario)
-- Sign up for Azure free account before ~Oct 24 (30-day credit must cover judging to Nov 10)
+- Phase 3 status (2026-10-18): Gemini key works (`scripts/list_gemini_models.py` → 63 models); `.env` confirmed git-ignored; installed agent-framework-core 1.22.0 + agent-framework-openai 1.17.0 (openai 3.35.1, httpx2). Model chosen: `models/gemini-3.5-flash-lite`.
+- **Resume here:** run `python -m scripts.check_llm` (first live call, untested), refresh `requirements.lock`, run pytest (check whether the Starlette/httpx warning changed), user reviews Indonesian sentence quality, then commit. Then propose the AI layer design.
+- Note: without Azure, Foundry / Azure Cloud Native category prizes are out of reach; Agent Framework is the Microsoft hero technology
