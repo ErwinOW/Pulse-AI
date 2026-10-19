@@ -54,7 +54,7 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 ## Known issues
 - Detector (v2) false alerts: ~0.4 per no-shift match; can fire on a short intense pressing burst. Small 5-minute counts limit what fixed thresholds can separate. UI should show confidence + sample notes; README must quote the seeds 300–309 numbers.
 - Balanced fixture (seed 7) is uneven for one match (possession 56/44, shots 21 vs 12); 20-seed test shows no systematic bias. Kept to avoid cherry-picking; simulator possessions are streakier than real football.
-- `StarletteDeprecationWarning`: Starlette suggests replacing `httpx` for its TestClient. Warning only; tests pass. Revisit before deployment — do not swap packages without checking the official Starlette changelog.
+- ~~`StarletteDeprecationWarning` (httpx → httpx2)~~ — resolved 2026-10-19: `httpx2` arrived as a dependency of the `openai` SDK; warning no longer shown.
 
 ## Notes
 - In dev, `/api/health` is requested twice per page load: React StrictMode intentionally runs effects twice in development only.
@@ -64,6 +64,9 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
   - v1 ("any 2 of 3 signals", 2-min persistence) on seeds 100–109: detected 9/10 planted presses, but **25 false alerts in 10 balanced matches** and 20 in 10 demo-scenario matches; also alerted on the 22' false-alarm burst. Cause: S2/S3 double-count the same lost balls; 2 min shorter than the burst.
   - v2: S1 required AND (S2 or S3); 4-min persistence. Held-out seeds 200–209: **6/10 detected, 4 false alerts (balanced), 5 (demo)** — missed targets. Fixed demo seed 42: 1 alert at 62', 0 false. Fixed balanced seed 7: 2 false.
   - v3: S1 = one-sided conditional binomial rate test (p < 0.01) instead of fixed ratio. Decision rule fixed in advance: v3 replaces v2 only if it has fewer total errors on fresh seeds 300–309 AND gets the fixed demo exactly right. Result: v3 7/10 detected, 3 false alerts total (6 errors) vs v2 9/10, 10 false (11 errors) — but v3 **missed the fixed demo**, so **v2 kept**. v3 remains in code (`V3_RATE_TEST`) as a documented, more conservative alternative. Tuning closed.
+
+- [x] 3.1–3.2 Gemini (`gemini-3.5-flash-lite`) via Agent Framework `OpenAIChatCompletionClient` — live check 1.57 s, EN + ID output; commit `eb32113`
+- [x] 3.3 Narrative core (`backend/app/narrative/`): fact sheets, `Narrative` schema, deterministic evidence validator (numbers, event ids, confidence, causal wording EN/ID, hypotheticals, ID decimal comma), EN/ID × casual/analyst fallbacks — **98 passed, 3 xfailed**
 
 ## Repository
 GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be public before submission** — check by Oct 26.
