@@ -14,10 +14,15 @@ COMBOS = [(a, l) for a in ("casual", "analyst") for l in ("en", "id")]
 
 
 @cache
-def demo_facts():
+def demo_alert():
     match, _ = generate(DEMO_HIGH_PRESS)
     (alert,) = detect_alerts(match.events, ("NBR", "EAS"), 6000)
-    return facts_from_alert(match, alert)
+    return match, alert
+
+
+@cache
+def demo_facts():
+    return facts_from_alert(*demo_alert())
 
 
 def base_narrative():
@@ -43,6 +48,25 @@ def test_fact_sheet_describes_the_demo_alert():
     assert facts.onset_minute <= facts.detected_minute <= facts.last_confirmed_minute
 
 
+def test_fact_sheet_uses_the_pre_shift_baseline_from_first_detection():
+    # Later confirmations' baselines already contain the press, hiding the contrast.
+    _, alert = demo_alert()
+    facts = demo_facts()
+    recent, baseline = facts.fact("S1.recent"), facts.fact("S1.baseline")
+
+    assert recent.window_end_s == alert.first_detected_s
+    assert baseline.window_end_s == recent.window_start_s
+    assert recent.value > baseline.value  # the increase the alert claims is visible
+
+
+def test_fact_sheet_confidence_matches_its_own_signals():
+    # Confidence and signals must come from the same moment: strong iff all 3 passed.
+    facts = demo_facts()
+    expected = "strong" if len(facts.signals_met) == 3 else "moderate"
+
+    assert facts.confidence == expected
+
+
 # --- Fallbacks must pass the same validator as AI output ----------------------------
 
 
@@ -66,6 +90,7 @@ def test_audiences_differ_but_share_the_same_facts():
 def test_indonesian_uses_decimal_comma():
     assert fmt(71.4, "id") == "71,4"
     assert fmt(71.4, "en") == "71.4"
+    assert fmt(1.13, "en") == "1.1"  # one decimal is the honest precision
     assert numbers_in("akurasi 71,4% dan 2.5 per menit") == [71.4, 2.5]
 
 

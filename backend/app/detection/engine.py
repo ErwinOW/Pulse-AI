@@ -46,10 +46,17 @@ class Alert(BaseModel):
     first_detected_s: float
     last_confirmed_s: float
     active: bool
-    confidence: Literal["moderate", "strong"]
+    confidence: Literal["moderate", "strong"]  # from the latest confirmation
     signals: list[SignalCheck]  # from the latest confirmation
     evidence_event_ids: list[str]  # accumulated across confirmations, in match order
-    sample_note: str | None
+    sample_note: str | None  # from the latest confirmation
+    # Snapshot when the alert was first raised: the baseline is still pre-shift, so this is
+    # the meaningful "before vs after" contrast for narratives. Later confirmations' baselines
+    # increasingly contain the shift itself. Narratives must use signals, confidence and
+    # sample note from the same moment.
+    detection_signals: list[SignalCheck] = []
+    detection_confidence: Literal["moderate", "strong"] | None = None
+    detection_sample_note: str | None = None
 
 
 def _sample_note(assessment: PressingAssessment) -> str | None:
@@ -122,7 +129,12 @@ def detect_alerts(
                         )
                         alerts.append(alert)
                         latest[team_id] = alert
-                    _apply(alert, assessment, order)
+                        _apply(alert, assessment, order)
+                        alert.detection_signals = assessment.signals
+                        alert.detection_confidence = alert.confidence
+                        alert.detection_sample_note = alert.sample_note
+                    else:
+                        _apply(alert, assessment, order)
                 elif alert is not None and not assessment.qualifies:
                     alert.active = False
         t += STEP_S

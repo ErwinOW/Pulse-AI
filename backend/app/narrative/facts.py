@@ -67,14 +67,17 @@ class InsightFacts(BaseModel):
 
 
 def facts_from_alert(match: Match, alert: Alert) -> InsightFacts:
-    windows = windows_at(alert.last_confirmed_s)
+    # Use the signals from first detection: their baseline precedes the shift. Later
+    # confirmations compare the shift with a baseline that already contains it.
+    windows = windows_at(alert.first_detected_s)
     if windows is None:  # cannot happen for a raised alert; guard anyway
         raise ValueError(f"alert {alert.alert_id} has no assessable window")
     recent_w, baseline_w = windows
     names = {match.home.team_id: match.home.name, match.away.team_id: match.away.name}
+    signals = alert.detection_signals or alert.signals
 
     facts: list[MetricFact] = []
-    for signal in alert.signals:
+    for signal in signals:
         for part, window, value, count in (
             ("baseline", baseline_w, signal.baseline_value, signal.baseline_sample_size),
             ("recent", recent_w, signal.recent_value, signal.recent_sample_size),
@@ -102,9 +105,10 @@ def facts_from_alert(match: Match, alert: Alert) -> InsightFacts:
         recent_window_minutes=round((recent_w[1] - recent_w[0]) / 60),
         baseline_window_minutes=round((baseline_w[1] - baseline_w[0]) / 60),
         score=score(match.events, (match.home.team_id, match.away.team_id), alert.first_detected_s),
-        confidence=alert.confidence,
-        sample_note=alert.sample_note,
-        signals_met=[s.description for s in alert.signals if s.passed],
+        # Same moment as the signals above (first detection).
+        confidence=alert.detection_confidence or alert.confidence,
+        sample_note=alert.detection_sample_note if alert.detection_signals else alert.sample_note,
+        signals_met=[s.description for s in signals if s.passed],
         facts=facts,
         evidence_event_ids=alert.evidence_event_ids,
     )

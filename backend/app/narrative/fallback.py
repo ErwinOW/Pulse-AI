@@ -11,7 +11,8 @@ CONFIDENCE_ID = {"moderate": "sedang", "strong": "kuat"}
 
 
 def fmt(value: float, language: Language) -> str:
-    text = f"{value:g}"
+    # One decimal: counts over 5-15 minutes do not support more precision.
+    text = f"{round(value, 1):g}"
     return text.replace(".", ",") if language == "id" else text
 
 
