@@ -54,6 +54,8 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 ## Known issues
 - Detector (v2) false alerts: ~0.4 per no-shift match; can fire on a short intense pressing burst. Small 5-minute counts limit what fixed thresholds can separate. UI should show confidence + sample notes; README must quote the seeds 300–309 numbers.
 - Balanced fixture (seed 7) is uneven for one match (possession 56/44, shots 21 vs 12); 20-seed test shows no systematic bias. Kept to avoid cherry-picking; simulator possessions are streakier than real football.
+- Opening goal in the demo has no recorded ball win (scripted patient build-up starts right after an EAS interception); turning points report `possession_start: "not_recorded"` instead of guessing. Fixing it means regenerating fixtures — not done.
+- New terminals need the venv: `C:\dev\pulse\backend\.venv\Scripts\Activate.ps1` (else "No module named pytest").
 - ~~`StarletteDeprecationWarning` (httpx → httpx2)~~ — resolved 2026-10-19: `httpx2` arrived as a dependency of the `openai` SDK; warning no longer shown.
 
 ## Notes
@@ -68,13 +70,16 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - [x] 3.1–3.2 Gemini (`gemini-3.5-flash-lite`) via Agent Framework `OpenAIChatCompletionClient` — live check 1.57 s, EN + ID output; commit `eb32113`
 - [x] 3.3 Narrative core (`backend/app/narrative/`): fact sheets, `Narrative` schema, deterministic evidence validator (numbers, event ids, confidence, causal wording EN/ID, hypotheticals, ID decimal comma), EN/ID × casual/analyst fallbacks — **98 passed, 3 xfailed**
 - [x] 3.4 Storyteller (Agent Framework `Agent`, schema / prompt-JSON modes) + generate→validate→retry→fallback pipeline — **108 passed**; commit `282be8a`
-- [ ] 3.5 Live run (gemini-3.5-flash-lite, schema mode works): 4/4 AI-written on first attempt, but review found validator v1 gaps — causal phrasings ("made it much harder", "hal ini membuat", "merespons") and an English text with decimal commas. Fixed in validator v2 + prompt v2; re-run pending.
+- [x] 3.5 Live run (gemini-3.5-flash-lite, schema mode): review found validator gaps (causal phrasings, decimal commas in English, "21.0" counts, English terms leaking into Indonesian); fixed across validator v2 + prompts v2–v4. 4 validated AI insights (EN/ID × casual/analyst) cached in `data/narratives/cache.json`, prompt v4 — **122 passed, 3 xfailed**; commit `c3e2af0`
+- [x] 4a.1 API: fixture loading, `GET /api/matches`, `/api/matches/{id}`, `/api/matches/{id}/state?t=`, `/api/definitions`; state uses only events before t (alerts/momentum per completed minute, cached) — **131 passed, 3 xfailed**; commit `ed9ce71`
+- [x] 4a.2 Turning points: `GET /api/matches/{id}/turning-points?t=` — per goal: possession traced back, turnover (under pressure?) when recorded, scoring team's pressures, score before/after, alerts confirmed within 10 min before (timing link only) — **137 passed, 3 xfailed** (2026-10-19)
 
 ## Repository
 GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be public before submission** — check by Oct 26.
 
 ## Next actions (resume here)
-- Approve + build pressing-increase detector (design proposed 2026-10-17: 2-of-3 signals, 5-min recent vs 15-min baseline, 2 consecutive minutes, dedup; evaluate on 10 extra seeds per scenario)
-- Phase 3 status (2026-10-18): Gemini key works (`scripts/list_gemini_models.py` → 63 models); `.env` confirmed git-ignored; installed agent-framework-core 1.22.0 + agent-framework-openai 1.17.0 (openai 3.35.1, httpx2). Model chosen: `models/gemini-3.5-flash-lite`.
-- **Resume here:** run `python -m scripts.check_llm` (first live call, untested), refresh `requirements.lock`, run pytest (check whether the Starlette/httpx warning changed), user reviews Indonesian sentence quality, then commit. Then propose the AI layer design.
+- Commit 4a.2 (turning points).
+- 4a.3 Insight endpoints: `GET /api/matches/{id}/insights/{alert_id}?audience=&language=` (cached AI or fallback immediately, labelled) + `POST .../regenerate` (usage cap, one at a time).
+- 4a.4 `WS /api/matches/{id}/replay?speed=&from=`.
+- Then: React dashboard, free no-card hosting research, README (measured detector numbers + limitations), architecture diagram, demo video < 2 min.
 - Note: without Azure, Foundry / Azure Cloud Native category prizes are out of reach; Agent Framework is the Microsoft hero technology

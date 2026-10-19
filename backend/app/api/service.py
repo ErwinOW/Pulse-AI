@@ -15,11 +15,19 @@ from pydantic import BaseModel, ConfigDict
 from app.detection import Alert, detect_alerts
 from app.narrative import match_minute
 from app.schema import Match
-from app.stats import WindowStats, compute_window, rolling_windows, score
+from app.stats import (
+    GoalTurningPoint,
+    WindowStats,
+    compute_window,
+    goal_turning_points,
+    rolling_windows,
+    score,
+)
 
 DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "matches"
 RECENT_EVENTS = 30
 STATS_WINDOW_S = 300.0
+ALERT_LINK_S = 600.0  # alerts confirmed within 10 minutes before a goal are linked (timing only)
 
 
 class TeamInfo(BaseModel):
@@ -130,3 +138,18 @@ def state_at(match_id: str, t: float) -> MatchState:
         momentum=momentum,
         alerts=alerts,
     )
+
+
+def turning_points_at(match_id: str, t: float) -> list[GoalTurningPoint]:
+    """Goals before t, each linked to alerts that were known and active shortly before it.
+
+    The link is a timing link only; it does not claim the alert caused the goal.
+    """
+    match = load_match(match_id)
+    points = goal_turning_points(events_before(match, t), teams_of(match))
+    linked = []
+    for p in points:
+        alerts, _ = _minute_products(match_id, float(int(p.timestamp_seconds // 60) * 60))
+        ids = [a.alert_id for a in alerts if a.last_confirmed_s >= p.timestamp_seconds - ALERT_LINK_S]
+        linked.append(p.model_copy(update={"related_alert_ids": ids}))
+    return linked

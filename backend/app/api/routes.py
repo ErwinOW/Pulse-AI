@@ -33,6 +33,15 @@ def get_state(match_id: str, t: float = Query(ge=0, description="Match clock in 
     return service.state_at(match_id, min(t, duration + 1))
 
 
+@router.get("/matches/{match_id}/turning-points", response_model=list[service.GoalTurningPoint])
+def get_turning_points(
+    match_id: str, t: float = Query(ge=0, description="Match clock in seconds")
+) -> list[service.GoalTurningPoint]:
+    match = _match_or_404(match_id)
+    duration = match.events[-1].timestamp_seconds
+    return service.turning_points_at(match_id, min(t, duration + 1))
+
+
 @router.get("/definitions")
 def get_definitions() -> dict[str, str]:
     """How every displayed metric is calculated (shown in the UI)."""
