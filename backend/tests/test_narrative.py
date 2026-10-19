@@ -73,7 +73,7 @@ def test_fact_sheet_confidence_matches_its_own_signals():
 @pytest.mark.parametrize(("audience", "language"), COMBOS)
 def test_fallback_narratives_pass_validation(audience, language):
     narrative = fallback_narrative(demo_facts(), audience, language)
-    result = validate(narrative, demo_facts())
+    result = validate(narrative, demo_facts(), language)
 
     assert result.ok, result.problems
 
@@ -136,6 +136,50 @@ def test_rejects_causal_wording_in_factual_text(summary_suffix):
     summary = base_narrative().summary + summary_suffix
 
     assert any("causal" in p for p in problems_for(summary=summary))
+
+
+@pytest.mark.parametrize(
+    "sentence",
+    [
+        # Real Gemini phrasings that passed validator v1:
+        " This aggressive approach made it much harder for Northbridge FC to keep possession.",
+        " Hal ini membuat Northbridge FC mengalami kehilangan bola.",
+        " Northbridge FC merespons dengan penurunan akurasi umpan.",
+        " The press forced Northbridge FC long.",
+        " Northbridge FC kehilangan bola sehingga akurasi umpan turun.",
+    ],
+    ids=["made-it", "hal-ini-membuat", "merespons", "forced", "sehingga"],
+)
+def test_rejects_causal_phrasings_found_in_live_output(sentence):
+    summary = base_narrative().summary + sentence
+
+    assert any("causal" in p for p in problems_for(summary=summary))
+
+
+def test_allows_non_causal_make():
+    summary = base_narrative().summary + " Eastvale Athletic made 11 high presses."
+
+    assert not any("causal" in p for p in problems_for(summary=summary))
+
+
+def test_rejects_wrong_decimal_separator_for_language():
+    facts = demo_facts()
+    en = fallback_narrative(facts, "analyst", "en")
+    id_ = fallback_narrative(facts, "analyst", "id")
+
+    assert any("decimal point" in p for p in
+               validate(en.model_copy(update={"summary": "Rate 2,2 per min."}), facts, "en").problems)
+    assert any("decimal comma" in p for p in
+               validate(id_.model_copy(update={"summary": "Laju 2.2 per menit."}), facts, "id").problems)
+
+
+@pytest.mark.parametrize("leak", ["dengan total 5 count", "turnover di bawah tekanan"])
+def test_rejects_english_terms_in_indonesian(leak):
+    facts = demo_facts()
+    narrative = fallback_narrative(facts, "analyst", "id")
+    leaked = narrative.model_copy(update={"summary": narrative.summary + f" Catatan: {leak}."})
+
+    assert any("English term" in p for p in validate(leaked, facts, "id").problems)
 
 
 def test_rejects_unhedged_causal_interpretation():

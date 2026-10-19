@@ -14,15 +14,23 @@ Indonesian decimals use a comma (71,4%), so both separators are accepted.
 import re
 
 from .facts import InsightFacts, match_minute
-from .schema import Narrative, ValidationResult
+from .schema import Language, Narrative, ValidationResult
 
 NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
+# Phrases rather than bare verbs, so "made 11 high presses" / "membuat 11 pressing" still pass.
+# v2 additions came from real Gemini output that slipped through v1 (see docs/PROGRESS.md).
 CAUSAL_RE = re.compile(
     r"\b(caus(e|es|ed|ing)|led to|leads? to|leading to|because of|due to|result(s|ed)? in|"
-    r"menyebabkan|mengakibatkan|disebabkan|karena|akibat)\b",
+    r"(made|makes|making) (it|them|him|her)|forc(e|es|ed|ing)|responded|in response|"
+    r"menyebabkan|mengakibatkan|disebabkan|karena|akibat|"
+    r"(hal ini|ini|itu|tersebut) membuat|memaksa|sehingga|merespons|merespon|berdampak)\b",
     re.IGNORECASE,
 )
+# Decimal separators by language: English 2.2, Indonesian 2,2.
+WRONG_DECIMAL_RE = {"en": re.compile(r"\d,\d"), "id": re.compile(r"\d\.\d")}
+# English fact-sheet terms that leaked into real Indonesian output.
+ENGLISH_IN_ID_RE = re.compile(r"\b(count|turnovers?|baseline|recent|build-up)\b", re.IGNORECASE)
 HEDGE_RE = re.compile(
     r"\b(may|might|could|possibly|likely|perhaps|suggests?|mungkin|bisa jadi|kemungkinan|"
     r"diduga|tampaknya)\b",
@@ -69,8 +77,21 @@ def numbers_in(text: str) -> list[float]:
     return [float(m.replace(",", ".")) for m in NUMBER_RE.findall(text)]
 
 
-def validate(narrative: Narrative, facts: InsightFacts) -> ValidationResult:
+def validate(
+    narrative: Narrative, facts: InsightFacts, language: Language | None = None
+) -> ValidationResult:
     problems: list[str] = []
+
+    # 0. Decimal separator matches the language (checked when the language is known)
+    if language is not None:
+        for field in ("headline", "summary", "interpretation"):
+            if WRONG_DECIMAL_RE[language].search(getattr(narrative, field)):
+                expected = "a decimal point (2.2)" if language == "en" else "a decimal comma (2,2)"
+                problems.append(f"{field}: numbers in language {language!r} must use {expected}")
+            if language == "id":
+                leaked = ENGLISH_IN_ID_RE.search(getattr(narrative, field))
+                if leaked:
+                    problems.append(f"{field}: English term {leaked.group(0)!r} in Indonesian text")
 
     # 1. Evidence
     if not narrative.event_ids:

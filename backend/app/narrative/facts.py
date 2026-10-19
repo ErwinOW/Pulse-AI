@@ -37,7 +37,7 @@ class MetricFact(BaseModel):
     team_id: str
     window_start_s: float
     window_end_s: float
-    value: float | None  # None = unavailable
+    value: int | float | None  # None = unavailable; counts are ints, rates 1 decimal
     unit: Unit
 
 
@@ -85,12 +85,15 @@ def facts_from_alert(match: Match, alert: Alert) -> InsightFacts:
             span = f"{part} window, minutes {match_minute(window[0])}-{match_minute(window[1]) - 1}"
             common = {"metric_id": signal.metric_id, "team_id": signal.team_id,
                       "window_start_s": window[0], "window_end_s": window[1]}
+            # One decimal: the model copies what it is given, and short windows do not
+            # support more precision.
+            shown = None if value is None else round(value, 1)
             facts.append(MetricFact(fact_id=f"{signal.signal_id}.{part}", unit=signal.unit,
-                                    label=f"{signal.description} ({span})", value=value, **common))
+                                    label=f"{signal.description} ({span})", value=shown, **common))
             facts.append(MetricFact(
                 fact_id=f"{signal.signal_id}.{part}_count", unit="count",
                 label=f"{names[signal.team_id]} {COUNT_LABELS[signal.metric_id]} ({span})",
-                value=count, **common))
+                value=int(count), **common))
 
     return InsightFacts(
         insight_id=alert.alert_id,

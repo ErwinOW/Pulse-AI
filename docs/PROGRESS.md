@@ -67,6 +67,8 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 
 - [x] 3.1–3.2 Gemini (`gemini-3.5-flash-lite`) via Agent Framework `OpenAIChatCompletionClient` — live check 1.57 s, EN + ID output; commit `eb32113`
 - [x] 3.3 Narrative core (`backend/app/narrative/`): fact sheets, `Narrative` schema, deterministic evidence validator (numbers, event ids, confidence, causal wording EN/ID, hypotheticals, ID decimal comma), EN/ID × casual/analyst fallbacks — **98 passed, 3 xfailed**
+- [x] 3.4 Storyteller (Agent Framework `Agent`, schema / prompt-JSON modes) + generate→validate→retry→fallback pipeline — **108 passed**; commit `282be8a`
+- [ ] 3.5 Live run (gemini-3.5-flash-lite, schema mode works): 4/4 AI-written on first attempt, but review found validator v1 gaps — causal phrasings ("made it much harder", "hal ini membuat", "merespons") and an English text with decimal commas. Fixed in validator v2 + prompt v2; re-run pending.
 
 ## Repository
 GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be public before submission** — check by Oct 26.

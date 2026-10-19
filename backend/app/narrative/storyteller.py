@@ -21,7 +21,11 @@ from .schema import Audience, Language, Narrative
 
 DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 TIMEOUT_S = 15.0
-PROMPT_VERSION = "v1"
+# v2: explicit causal phrasings, decimal separators, ID wording
+# v3: rate units, no implied decisions/intent, fewer suggested stock phrases
+# v4: counts written as number + noun (v3 leaked the word "count"); output length cap
+PROMPT_VERSION = "v4"
+MAX_OUTPUT_TOKENS = 900  # an insight never needs more; stops runaway generations
 
 INSTRUCTIONS = """You are PULSE's Storyteller: you turn verified football match facts into short,
 accurate insights. You never compute statistics; you only word the facts you are given.
@@ -32,11 +36,19 @@ Hard rules (your answer is checked automatically and rejected if any rule is bro
 2. For every number you use, add an entry to metric_claims with that fact's fact_id and value.
 3. event_ids: cite 3 to 8 ids, taken ONLY from the fact sheet's evidence_event_ids.
 4. confidence must equal the fact sheet's confidence. is_hypothetical must be false.
-5. Correlation is not causation. Headline and summary describe what was observed only: never
-   use words like "caused", "led to", "because of", "due to", "resulted in", "menyebabkan",
-   "mengakibatkan", "karena", "akibat". The interpretation may suggest meaning, but must be
+5. Correlation is not causation. Headline and summary describe what was observed only, side
+   by side, never one thing producing another. Forbidden there: "caused", "led to", "because
+   of", "due to", "resulted in", "made it harder", "forced", "responded"; and in Indonesian
+   "menyebabkan", "mengakibatkan", "karena", "akibat", "hal ini membuat", "memaksa",
+   "sehingga", "merespons", "berdampak". The interpretation may suggest a link, but must be
    hedged ("may", "might", "could" / "mungkin", "bisa jadi").
-6. Do not claim to know a coach's or player's intentions, emotions, or injuries.
+6. Describe what the data shows, not what anyone decided: no "adjusted their approach",
+   "tactical shift", "chose to", "strategy". Never claim intentions, emotions, or injuries.
+7. Number format: copy values exactly as given. English uses a decimal point (2.2);
+   Indonesian uses a decimal comma (2,2).
+8. Units: rates (unit per_min) always get "per minute" / "per menit". Event totals are
+   written as a number plus what was counted, e.g. "11 high presses" / "11 kali pressing
+   tinggi", "21 passes" / "21 umpan" - never the word "count". Percentages get "%".
 
 Audiences:
 - casual: plain language, no jargon, explain why it matters; summary at most 2 sentences.
@@ -46,8 +58,10 @@ Audiences:
 Languages:
 - en: natural English.
 - id: natural Bahasa Indonesia as used by Indonesian football commentators (for example
-  "pressing tinggi", "kehilangan bola", "akurasi umpan"). Use a decimal comma (2,2) and keep
-  team names unchanged.
+  "pressing tinggi", "kehilangan bola", "akurasi umpan"). Keep team names unchanged. The fact
+  sheet labels are in English: do not copy English words like "baseline", "recent",
+  "build-up", or "turnover"; say "5 menit terakhir", "15 menit sebelumnya", "membangun
+  serangan", "kehilangan bola". Use normal sentence case for headlines.
 """
 
 JSON_SHAPE = (
@@ -103,7 +117,7 @@ class AgentStoryteller:
 
     async def write(self, facts, audience, language, feedback=None) -> Narrative:
         prompt = build_prompt(facts, audience, language, feedback, json_shape=not self.use_schema)
-        options: dict = {"temperature": 0.4}
+        options: dict = {"temperature": 0.4, "max_tokens": MAX_OUTPUT_TOKENS}
         if self.use_schema:
             options["response_format"] = Narrative
         try:
@@ -124,16 +138,22 @@ class AgentStoryteller:
             raise StorytellerError(f"{type(error).__name__}: {str(error)[:200]}") from error
 
 
-def storyteller_from_env() -> AgentStoryteller | None:
+def storyteller_from_env(timeout_s: float | None = None) -> AgentStoryteller | None:
     """Gemini via Agent Framework, or None when no key is configured (AI disabled)."""
     key, model = setting("GEMINI_API_KEY"), setting("GEMINI_MODEL")
     if not key or not model:
         return None
     from agent_framework.openai import OpenAIChatCompletionClient
+    from openai import AsyncOpenAI
 
+    timeout_s = timeout_s or float(setting("STORYTELLER_TIMEOUT_S", str(TIMEOUT_S)))
     model = model.removeprefix("models/")
-    client = OpenAIChatCompletionClient(
-        model=model, api_key=key, base_url=setting("GEMINI_BASE_URL", DEFAULT_BASE_URL)
+    # max_retries=0: the SDK otherwise silently waits and retries on rate limits (429), which
+    # surfaced as a timeout. Our pipeline already retries once and falls back.
+    sdk = AsyncOpenAI(
+        api_key=key, base_url=setting("GEMINI_BASE_URL", DEFAULT_BASE_URL),
+        max_retries=0, timeout=timeout_s,
     )
+    client = OpenAIChatCompletionClient(model=model, async_client=sdk)
     use_schema = (setting("STORYTELLER_USE_SCHEMA", "true") or "true").lower() == "true"
-    return AgentStoryteller(client, model_name=model, use_schema=use_schema)
+    return AgentStoryteller(client, model_name=model, use_schema=use_schema, timeout_s=timeout_s)
