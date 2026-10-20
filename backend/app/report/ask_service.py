@@ -2,7 +2,8 @@
 
 Every model request (each tool round and each answer) counts towards DAILY_MODEL_CALL_CAP,
 counted by an Agent Framework chat middleware, so a public demo link cannot exhaust the free
-tier. Insights keep their own cap (app/api/insights.py).
+tier. Insights keep their own cap (app/api/insights.py). Human-approved answers to suggested
+questions (app/report/suggested.py) are served first, without a model call.
 """
 
 from datetime import date
@@ -14,6 +15,7 @@ from app.narrative.schema import Audience, Language
 
 from .analyst import MAX_QUESTION_CHARS, Analyst, AnswerResult, analyst_from_env, answer_question
 from .analyst_tools import MatchTools
+from .suggested import AnswerCache
 
 DAILY_MODEL_CALL_CAP = 60
 
@@ -27,6 +29,7 @@ class AskRequest(BaseModel):
 
 class AskResponse(BaseModel):
     answer: AnswerResult
+    cached: bool  # a human-approved saved answer, no model call
     model_calls_left_today: int
 
 
@@ -42,7 +45,8 @@ class DailyCapReached(Exception):
 
 
 class AskService:
-    def __init__(self, cap: int = DAILY_MODEL_CALL_CAP):
+    def __init__(self, answers: AnswerCache | None = None, cap: int = DAILY_MODEL_CALL_CAP):
+        self.answers = answers if answers is not None else AnswerCache()
         self.cap = cap
         self.busy = False
         self._day = date.today()
@@ -64,6 +68,9 @@ class AskService:
         return count
 
     async def ask(self, match_id: str, request: AskRequest, analyst: Analyst | None) -> AskResponse:
+        saved = self.answers.get(match_id, request.question, request.audience, request.language)
+        if saved is not None:
+            return AskResponse(answer=saved, cached=True, model_calls_left_today=self.calls_left())
         if analyst is None:
             raise AskError(503, "AI is not configured on this server")
         if self.busy:
@@ -77,7 +84,7 @@ class AskService:
                                            request.language, analyst, [self._count_model_calls()])
         finally:
             self.busy = False
-        return AskResponse(answer=answer, model_calls_left_today=self.calls_left())
+        return AskResponse(answer=answer, cached=False, model_calls_left_today=self.calls_left())
 
 
 ask_service = AskService()

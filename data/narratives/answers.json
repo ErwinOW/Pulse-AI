@@ -1,0 +1,242 @@
+{
+  "demo-high-press|casual|en|q1|how were the goals scored": {
+    "question": "How were the goals scored?",
+    "answer": "Northbridge FC scored first in the 35th minute after 5 passes, and Eastvale Athletic leveled it at 1-1 in the 64th minute following a ball lost under pressure in the build-up.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "goals"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:05:58+00:00"
+  },
+  "demo-high-press|casual|en|q1|who pressed more in the second half": {
+    "question": "Who pressed more in the second half?",
+    "answer": "Eastvale Athletic pressed much more in the second half, registering 38 high presses compared to Northbridge FC's 10.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 45'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:06:13+00:00"
+  },
+  "demo-high-press|casual|en|q1|which team created more chances": {
+    "question": "Which team created more chances?",
+    "answer": "Northbridge FC took 17 shots while Eastvale Athletic managed 16. Northbridge FC also edged the shots on target with 10 compared to Eastvale Athletic's 8.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 0'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:06:22+00:00"
+  },
+  "demo-high-press|casual|en|q1|what did pulse's pressing alert show": {
+    "question": "What did PULSE's pressing alert show?",
+    "answer": "At minute 63, PULSE's pressing alert showed strong confidence that Eastvale Athletic stepped up their high pressing, making 11 high presses in 5 minutes.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "pressing_alerts"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:06:43+00:00"
+  },
+  "demo-high-press|analyst|en|q1|who pressed more in the second half": {
+    "question": "Who pressed more in the second half?",
+    "answer": "Eastvale Athletic recorded 38 high presses in the second half, whereas Northbridge FC registered 10 high presses during the same interval.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 45'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:08:10+00:00"
+  },
+  "demo-high-press|analyst|en|q1|which team created more chances": {
+    "question": "Which team created more chances?",
+    "answer": "Northbridge FC recorded 17 shots with 10 on target and 35 penalty-box entries, while Eastvale Athletic registered 16 shots with 8 on target and 37 penalty-box entries.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 0'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:08:28+00:00"
+  },
+  "demo-high-press|analyst|en|q1|what did pulse's pressing alert show": {
+    "question": "What did PULSE's pressing alert show?",
+    "answer": "PULSE's pressing alert at 63' showed Eastvale Athletic made 11 high presses in the 5 minutes before the alert, compared to 5 in the 15 minutes before that (6.6 times as often per minute). Northbridge FC's pass completion was 61.9% in those 5 minutes and 88.4% before.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "pressing_alerts"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:08:45+00:00"
+  },
+  "demo-high-press|casual|id|q1|bagaimana gol-gol dicetak": {
+    "question": "Bagaimana gol-gol dicetak?",
+    "answer": "Gol pertama dicetak pada menit ke-35 lewat lima operan, sedangkan gol penyeimbang pada menit ke-64 tercipta hanya dengan satu operan setelah bola direbut di daerah pertahanan lawan. Skor akhir pertandingan adalah 1-1.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "goals"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:09:13+00:00"
+  },
+  "demo-high-press|casual|id|q1|tim mana yang menciptakan lebih banyak peluang": {
+    "question": "Tim mana yang menciptakan lebih banyak peluang?",
+    "answer": "Northbridge FC melepaskan 17 tembakan dan Eastvale Athletic 16 tembakan, yang menunjukkan Northbridge FC menciptakan sedikit lebih banyak peluang tembakan.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 0'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:09:48+00:00"
+  },
+  "demo-high-press|analyst|id|q1|bagaimana gol-gol dicetak": {
+    "question": "Bagaimana gol-gol dicetak?",
+    "answer": "Gol pertama dicetak Northbridge FC pada menit ke-35 melalui skema 5 operan dalam waktu 14 detik. Gol kedua dicetak Eastvale Athletic pada menit ke-64 setelah Northbridge FC kehilangan bola di sepertiga area sendiri di bawah pressing Eastvale Athletic, yang langsung mencetak gol 8 detik kemudian dari 1 operan.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "goals"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:10:23+00:00"
+  },
+  "demo-high-press|analyst|id|q1|tim mana yang menciptakan lebih banyak peluang": {
+    "question": "Tim mana yang menciptakan lebih banyak peluang?",
+    "answer": "Northbridge FC mencatatkan 17 tembakan dan 10 tembakan tepat sasaran, sementara Eastvale Athletic mencatatkan 16 tembakan dan 8 tembakan tepat sasaran. Northbridge FC juga mencatat penguasaan bola 57,1% dan 35 masuk kotak penalti, sedangkan Eastvale Athletic mencatatkan 37 masuk kotak penalti.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 0'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:11:07+00:00"
+  },
+  "demo-high-press|analyst|id|q1|apa yang ditunjukkan peringatan pressing pulse": {
+    "question": "Apa yang ditunjukkan peringatan pressing PULSE?",
+    "answer": "Peringatan pressing PULSE pada menit 63 menunjukkan Eastvale Athletic melakukan pressing tinggi jauh lebih sering, dengan 11 high presses dalam 5 menit sebelum peringatan dibandingkan 5 dalam 15 menit sebelumnya (6,6 kali lipat per menit). Penyelesaian operan Northbridge FC turun menjadi 61,9% pada 5 menit tersebut dari 88,4% sebelumnya.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "pressing_alerts"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:11:18+00:00"
+  },
+  "demo-high-press|analyst|en|q1|how were the goals scored": {
+    "question": "How were the goals scored?",
+    "answer": "Northbridge FC scored in the 35th minute after a 14-second move with 5 passes, while Eastvale Athletic equalized in the 64th minute following a ball lost under pressure in Northbridge FC's third, using 1 pass in 8 seconds.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "goals"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:14:01+00:00"
+  },
+  "demo-high-press|casual|id|q1|tim mana yang lebih banyak melakukan pressing di babak kedua": {
+    "question": "Tim mana yang lebih banyak melakukan pressing di babak kedua?",
+    "answer": "Eastvale Athletic melakukan 38 high presses di babak kedua, sementara Northbridge FC hanya mencatatkan 10 high presses. Data ini menunjukkan Eastvale Athletic jauh lebih aktif menekan lawan pada paruh kedua.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 45'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:14:29+00:00"
+  },
+  "demo-high-press|casual|id|q1|apa yang ditunjukkan peringatan pressing pulse": {
+    "question": "Apa yang ditunjukkan peringatan pressing PULSE?",
+    "answer": "Peringatan pressing PULSE menunjukkan bahwa Eastvale Athletic melakukan pressing tinggi jauh lebih sering pada menit ke-63, mencapai 6,6 kali lipat lebih sering per menit. Ketepatan operan Northbridge FC turun menjadi 61,9% selama 5 menit tersebut.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "pressing_alerts"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:15:09+00:00"
+  },
+  "demo-high-press|analyst|id|q1|tim mana yang lebih banyak melakukan pressing di babak kedua": {
+    "question": "Tim mana yang lebih banyak melakukan pressing di babak kedua?",
+    "answer": "Eastvale Athletic melakukan 38 high presses di babak kedua, sedangkan Northbridge FC mencatatkan 10 high presses pada periode yang sama.",
+    "source": "ai",
+    "fallback_reason": null,
+    "looked_at": [
+      "team_stats 45'-90'"
+    ],
+    "data_found": [],
+    "attempts": 1,
+    "rejected": [],
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "q1",
+    "generated_at": "2026-10-20T11:15:28+00:00"
+  }
+}

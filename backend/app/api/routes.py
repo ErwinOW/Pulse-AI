@@ -6,6 +6,7 @@ from app.narrative.schema import Audience, Language
 from app.narrative.storyteller import Storyteller
 from app.report.analyst import Analyst
 from app.report.ask_service import AskError, AskRequest, AskResponse, AskService, get_analyst, get_ask_service
+from app.report.suggested import SUGGESTED
 from app.report.service import ReportResponse, ReportService, get_report_service
 from app.stats import DEFINITIONS
 
@@ -118,6 +119,12 @@ async def get_report(
     if t < match.events[-1].timestamp_seconds:
         raise HTTPException(status_code=409, detail="The full-time report is available at the final whistle.")
     return await reports.get(match_id, audience, language)
+
+
+@router.get("/suggested-questions")
+def get_suggested_questions(language: Language = "en") -> list[str]:
+    """Questions offered as buttons; their answers may be saved after human review."""
+    return SUGGESTED[language]
 
 
 @router.post("/matches/{match_id}/ask", response_model=AskResponse)

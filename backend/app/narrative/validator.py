@@ -23,7 +23,8 @@ NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)?")
 CAUSAL_RE = re.compile(
     r"\b(caus(e|es|ed|ing)|led to|leads? to|leading to|because of|due to|result(s|ed)? in|"
     r"(made|makes|making) (it|them|him|her)|forc(e|es|ed|ing)|responded|in response|"
-    r"menyebabkan|mengakibatkan|disebabkan|karena|akibat|"
+    r"as a (result|consequence)|as a result of|consequently|therefore|thus|"
+    r"menyebabkan|mengakibatkan|disebabkan|karena|karenanya|akibat|akibatnya|sebagai akibat|oleh karena itu|"
     r"(hal ini|ini|itu|tersebut) membuat|memaksa|sehingga|merespons|merespon|berdampak)\b",
     re.IGNORECASE,
 )

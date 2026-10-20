@@ -13,6 +13,7 @@ from app.report.analyst_tools import MatchTools
 from app.report.answer_checker import DECLINE
 from app.report.ask_service import AskService, DailyCapReached, get_analyst, get_ask_service
 from app.report.facts import end_time
+from app.report.suggested import SUGGESTED, AnswerCache
 from tests.test_gemini_client import FakeSDK, match_goals
 
 DEMO = "demo-high-press"
@@ -111,8 +112,8 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def asks():
-    service = AskService()
+def asks(tmp_path):
+    service = AskService(answers=AnswerCache(tmp_path / "answers.json"))
     app.dependency_overrides[get_ask_service] = lambda: service
     yield service
     app.dependency_overrides.clear()
@@ -147,3 +148,30 @@ def test_ask_endpoint_without_ai_or_quota(asks):
     app.dependency_overrides[get_analyst] = lambda: FakeAnalyst(GOOD)
     asks.cap = 0
     assert post().status_code == 429
+
+
+def test_suggested_questions_are_listed_per_language():
+    for language in ("en", "id"):
+        assert client.get("/api/suggested-questions", params={"language": language}).json() == SUGGESTED[language]
+
+
+def test_approved_answer_is_served_without_ai_or_quota(asks):
+    question = SUGGESTED["en"][0]
+    approved = ask(FakeAnalyst(GOOD), question)
+    asks.answers.put(DEMO, "casual", "en", approved)
+    app.dependency_overrides[get_analyst] = lambda: None  # no AI at all
+    asks.cap = 0
+
+    body = post(question=f"  {question.upper()} ").json()  # same question, different spacing/case
+    assert body["cached"] is True and body["answer"]["answer"] == GOOD
+
+
+def test_only_checked_ai_answers_can_be_saved(tmp_path):
+    with pytest.raises(ValueError):
+        AnswerCache(tmp_path / "a.json").put(DEMO, "casual", "en", ask(FakeAnalyst(BAD, BAD)))
+
+
+def test_committed_answers_are_approved_ai_answers_for_suggested_questions():
+    questions = {q for qs in SUGGESTED.values() for q in qs}
+    for entry in AnswerCache().entries.values():
+        assert entry["source"] == "ai" and entry["question"] in questions

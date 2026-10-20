@@ -84,6 +84,7 @@ def test_accurate_answers_pass():
     ("Eastvale scored 12 seconds after winning the ball.", "number 12"),
     ("Eastvale pressed 6,6 times as often.", "decimal point"),
     ("The pressing caused the equaliser.", "must be hedged"),
+    ("Eastvale pressed more. As a result, Northbridge lost the ball.", "must be hedged"),
     ("Eastvale decided to press higher after the hour.", "intent"),
     ("Northbridge would have won if they had kept the ball.", "hypotheticals"),
     ("One. Two. Three. Four.", "sentences"),
@@ -100,6 +101,14 @@ def test_numbers_must_come_from_tools_used_for_this_question():
 
     assert any("tool" in p for p in check_answer(answer, MatchTools(DEMO), "en").problems)
     assert check_answer(answer, looked_up("goals"), "en").ok
+
+
+def test_indonesian_unhedged_cause_is_rejected():
+    # Real approved-then-caught answer: "Akibatnya" (= "as a result") slipped past the "akibat" rule.
+    answer = "Eastvale Athletic menekan 6,6 kali lebih sering. Akibatnya, operan Northbridge FC menurun."
+    result = check_answer(answer, looked_up("pressing_alerts"), "id")
+
+    assert any("must be hedged" in p for p in result.problems), result.problems
 
 
 def test_indonesian_answer_with_english_terms_is_rejected():
