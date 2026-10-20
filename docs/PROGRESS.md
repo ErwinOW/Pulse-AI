@@ -80,12 +80,15 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - [x] 6.2 Momentum chart (Recharts): diverging bars per minute (home above / away below the middle line, user's request), alert window shaded, goal markers; `/state` sends `goals`; commit `66c0998`
 - [x] 6.3 Insight card: cached/fallback text per audience + language, source labels, evidence table (before vs now + counts) and cited events (`evidence_events` in insight API), regenerate with busy/limit messages — **162 passed, 3 xfailed**; commit `1ea322f`
 - [x] 6.4 Turning points panel, full EN/ID UI strings (`src/i18n.ts`, `<html lang>`), two-row controls (wide timeline), phone layout; checked EN + ID + mobile in browser (2026-10-21)
+- [x] 6.5 Casual vs analyst made distinct (user feedback): prompt **v5** (casual = fan language, at most 2 event totals, no rates/%) enforced by a new validator rule; casual fallback rewritten to match; analyst gets a Numbers panel (last 5 min vs match), y-axis values, pitch thirds in the feed, evidence open by default. Cache regenerated: 4/4 AI first attempt. Known weakness kept: casual/en summary has a hedged guess ("might have unsettled") the validator's causal list does not cover — **163 passed, 3 xfailed**; commit `db92d4f`
+- [x] 6.6 Whole app live as ONE Render service (user chose the simpler option): FastAPI serves `frontend/dist` at `/`; Render builds frontend + backend from the repo root (no rootDir). Render service settings had to be fixed by hand (start command kept the old value after the push; Blueprint sync is partial) — **165 passed, 3 xfailed**; commit `7895b62`. Verified live 2026-10-21: page, live stream (WSS), seek, chart, cached v5 insight EN/ID, turning points, playback ~10x.
 
 ## Repository
 GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be public before submission** — check by Oct 26.
 
 ## Next actions (resume here)
-- Step 5: deploy frontend (decide: Render static site vs served by backend) + check live end to end; optional replay speed fix (precompute minute products at startup).
+- Judges' link: **https://pulse-k9mh.onrender.com** (free plan: ~1 min blank page if asleep).
+- README (what it does, architecture, agent design, measured detector numbers + limitations, how to run), architecture diagram, demo video < 2 min; make repo public by Oct 26; submit by Oct 27 23:59 PT.
+- Optional: keep-alive ping during judging, replay speed fix, Render settings must stay in sync with render.yaml (check Settings after editing it).
 - User to review Indonesian UI wording (src/i18n.ts).
-- Then: README (measured detector numbers + limitations), architecture diagram, demo video < 2 min; make repo public by Oct 26.
 - Note: without Azure, Foundry / Azure Cloud Native category prizes are out of reach; Agent Framework is the Microsoft hero technology
