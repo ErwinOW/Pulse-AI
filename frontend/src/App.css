@@ -268,6 +268,104 @@
   margin-top: 4px;
 }
 
+.badge-accent {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.badge-success {
+  color: var(--success);
+  background: var(--success-bg);
+}
+
+.badge-muted {
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.insight p {
+  margin: 6px 0;
+}
+
+.insight-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.alert-picker {
+  margin-bottom: 8px;
+}
+
+.insight-headline {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 10px 0 4px;
+}
+
+.insight-why {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.insight-note {
+  display: inline-block;
+}
+
+.insight-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.insight-actions button {
+  font-size: 13px;
+}
+
+.insight-notice {
+  font-size: 13px;
+}
+
+.evidence {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.evidence h4 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 12px 0 4px;
+}
+
+.evidence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.evidence-table th,
+.evidence-table td {
+  text-align: left;
+  padding: 4px 6px 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.evidence-table th {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.evidence-caption {
+  font-size: 12px;
+}
+
 @media (max-width: 760px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);

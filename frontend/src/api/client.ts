@@ -1,6 +1,6 @@
 // Thin fetch wrapper for the PULSE API. In development Vite proxies /api to FastAPI;
 // in production VITE_API_URL can point at the backend when the frontend is hosted separately.
-import type { MatchState, MatchSummary } from './types'
+import type { Audience, InsightResponse, Language, MatchState, MatchSummary } from './types'
 
 const API_BASE: string = import.meta.env.VITE_API_URL ?? ''
 
@@ -12,8 +12,8 @@ export class ApiError extends Error {
   }
 }
 
-async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, { signal })
+async function getJson<T>(path: string, signal?: AbortSignal, method = 'GET'): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, { signal, method })
   if (!response.ok) {
     let detail = `HTTP ${response.status}`
     try {
@@ -31,6 +31,15 @@ export const api = {
   matches: (signal?: AbortSignal) => getJson<MatchSummary[]>('/api/matches', signal),
   state: (matchId: string, t: number, signal?: AbortSignal) =>
     getJson<MatchState>(`/api/matches/${encodeURIComponent(matchId)}/state?t=${t}`, signal),
+  insight: (matchId: string, alertId: string, audience: Audience, language: Language, signal?: AbortSignal) =>
+    getJson<InsightResponse>(insightPath(matchId, alertId, audience, language), signal),
+  regenerate: (matchId: string, alertId: string, audience: Audience, language: Language) =>
+    getJson<InsightResponse>(insightPath(matchId, alertId, audience, language, '/regenerate'), undefined, 'POST'),
+}
+
+function insightPath(matchId: string, alertId: string, audience: Audience, language: Language, suffix = '') {
+  const query = new URLSearchParams({ audience, language })
+  return `/api/matches/${encodeURIComponent(matchId)}/insights/${encodeURIComponent(alertId)}${suffix}?${query}`
 }
 
 /** ws:// or wss:// URL for a backend path, matching the API's origin. */

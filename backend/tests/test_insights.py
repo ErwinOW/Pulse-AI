@@ -103,6 +103,14 @@ def test_rejected_regeneration_falls_back_and_keeps_the_cached_text(insights):
     assert get().json()["insight"] == good
 
 
+def test_insight_includes_its_evidence_events_and_none_after_detection(insights):
+    body = get(t=9999).json()
+    ids = {e["event_id"] for e in body["evidence_events"]}
+
+    assert ids == set(body["facts"]["evidence_event_ids"]) | set(body["insight"]["narrative"]["event_ids"])
+    assert all(e["timestamp_seconds"] <= DETECTED_S for e in body["evidence_events"])
+
+
 def test_regenerate_without_a_key_is_503(insights):
     assert regenerate().status_code == 503
 

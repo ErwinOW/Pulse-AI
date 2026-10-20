@@ -12,6 +12,7 @@ from .insights import (
     InsightResponse,
     InsightService,
     detection_facts,
+    with_evidence,
     get_insight_service,
     get_storyteller,
 )
@@ -70,7 +71,7 @@ async def get_insight(
     insights: InsightService = Depends(get_insight_service),
 ) -> InsightResponse:
     """Cached validated AI text, or the labelled deterministic fallback. Never calls the model."""
-    return await insights.get(_facts_or_404(match_id, alert_id, t), audience, language)
+    return with_evidence(match_id, await insights.get(_facts_or_404(match_id, alert_id, t), audience, language))
 
 
 @router.post("/matches/{match_id}/insights/{alert_id}/regenerate", response_model=InsightResponse)
@@ -85,7 +86,7 @@ async def regenerate_insight(
     """Live write -> validate -> retry -> fallback; one at a time, capped per day."""
     facts = _facts_or_404(match_id, alert_id, None)
     try:
-        return await insights.regenerate(facts, audience, language, storyteller)
+        return with_evidence(match_id, await insights.regenerate(facts, audience, language, storyteller))
     except InsightError as error:
         raise HTTPException(status_code=error.status_code, detail=error.detail) from None
 

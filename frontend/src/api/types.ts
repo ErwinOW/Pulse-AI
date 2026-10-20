@@ -132,3 +132,61 @@ export type ReplayMessage = ReplayControl | ReplayTick | ReplayEnd | ReplayError
 
 export type Audience = 'casual' | 'analyst'
 export type Language = 'en' | 'id'
+
+// Insights (backend/app/narrative + app/api/insights.py).
+export type Narrative = {
+  headline: string
+  summary: string
+  event_ids: string[]
+  metric_claims: { fact_id: string; value: number }[]
+  interpretation: string
+  confidence: 'moderate' | 'strong'
+  is_hypothetical: boolean
+}
+
+export type Insight = {
+  insight_id: string
+  audience: Audience
+  language: Language
+  narrative: Narrative
+  source: 'ai' | 'fallback'
+  model: string | null
+  prompt_version: string | null
+  attempts: number
+  rejected_attempts: string[][]
+  fallback_reason: string | null
+  generated_at: string
+}
+
+export type MetricFact = {
+  fact_id: string
+  label: string
+  metric_id: string
+  team_id: string
+  window_start_s: number
+  window_end_s: number
+  value: number | null
+  unit: string
+}
+
+export type InsightFacts = {
+  insight_id: string
+  team_id: string
+  team_name: string
+  opponent_name: string
+  onset_minute: number
+  detected_minute: number
+  confidence: 'moderate' | 'strong'
+  sample_note: string | null
+  signals_met: string[]
+  facts: MetricFact[]
+  evidence_event_ids: string[]
+}
+
+export type InsightResponse = {
+  insight: Insight
+  cached: boolean
+  facts: InsightFacts
+  regenerations_left_today: number
+  evidence_events: MatchEvent[]
+}

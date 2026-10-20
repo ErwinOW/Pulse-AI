@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { Alert, MatchState, TeamInfo } from '../api/types'
+import { minuteOf } from '../format'
 
 const FULL_MATCH_MIN = 90
 const TICKS = [15, 30, 45, 60, 75, 90]
@@ -23,9 +24,6 @@ type Props = {
 }
 
 type Point = { minute: number; diff: number | null }
-
-/** Match minute that contains time s (61:30 -> 62). */
-const minuteOf = (s: number) => Math.floor(s / 60) + 1
 
 /**
  * Who has the upper hand, minute by minute: home momentum minus away momentum

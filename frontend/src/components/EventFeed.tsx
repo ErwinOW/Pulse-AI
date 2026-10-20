@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { KeyTag, MatchEvent } from '../api/types'
-import { clockLabel } from '../format'
+import { clockLabel, describeEvent } from '../format'
 
 const SHOWN = 15
 
@@ -29,31 +29,6 @@ const TAG_KIND: Record<KeyTag, string> = {
   foul: 'other',
   substitution: 'other',
   period: 'other',
-}
-
-const EVENT_LABELS: Record<string, string> = {
-  pass: 'Pass',
-  carry: 'Carry',
-  shot: 'Shot',
-  pressure: 'Pressure',
-  tackle: 'Tackle',
-  interception: 'Interception',
-  ball_recovery: 'Ball recovery',
-  foul: 'Foul',
-  substitution: 'Substitution',
-}
-
-function periodLabel(e: MatchEvent): string {
-  if (e.event_type === 'period_start') return e.period === 1 ? 'Kick-off' : 'Second half'
-  return e.period === 1 ? 'Half-time' : 'Full-time'
-}
-
-function describe(e: MatchEvent): string {
-  if (e.event_type === 'period_start' || e.event_type === 'period_end') return periodLabel(e)
-  const base = EVENT_LABELS[e.event_type] ?? e.event_type
-  if (e.event_type === 'shot' && e.outcome) return `${base} (${e.outcome.replace('_', ' ')})`
-  if (e.event_type === 'pass' && e.outcome && e.outcome !== 'complete') return `${base} (${e.outcome})`
-  return base
 }
 
 type Props = {
@@ -87,7 +62,7 @@ export function EventFeed({ events, tags, teamNames }: Props) {
             <li key={e.event_id}>
               <span className="feed-time">{clockLabel(e.timestamp_seconds)}</span>
               <span className="feed-team">{e.team_id ? teamNames[e.team_id] ?? e.team_id : ''}</span>
-              <span className="feed-text">{describe(e)}</span>
+              <span className="feed-text">{describeEvent(e)}</span>
               {(tags[e.event_id] ?? [])
                 .filter((tag) => TAG_LABELS[tag])
                 .map((tag) => (

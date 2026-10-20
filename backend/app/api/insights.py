@@ -27,6 +27,14 @@ class InsightResponse(BaseModel):
     cached: bool  # served from the validated-AI cache
     facts: InsightFacts  # what the text was allowed to use (numbers + evidence ids)
     regenerations_left_today: int
+    evidence_events: list[dict] = []  # events behind the alert and the text, oldest first
+
+
+def with_evidence(match_id: str, response: InsightResponse) -> InsightResponse:
+    """Attach the evidence events (all before detection, so nothing from the future)."""
+    ids = set(response.facts.evidence_event_ids) | set(response.insight.narrative.event_ids)
+    events = [e.model_dump(mode="json") for e in service.load_match(match_id).events if e.event_id in ids]
+    return response.model_copy(update={"evidence_events": events})
 
 
 class InsightError(Exception):

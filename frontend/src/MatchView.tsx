@@ -1,5 +1,6 @@
 import type { Audience, Language, MatchSummary } from './api/types'
 import { EventFeed } from './components/EventFeed'
+import { InsightCard } from './components/InsightCard'
 import { MomentumChart } from './components/MomentumChart'
 import { clockLabel } from './format'
 import { useReplay } from './hooks/useReplay'
@@ -112,14 +113,13 @@ export function MatchView(props: Props) {
           />
         </div>
         <div className="column">
-          <section className="card">
-            <h2>Insight</h2>
-            <p className="muted">
-              {replay.snapshot?.alerts.length
-                ? `${replay.snapshot.alerts.length} alert(s) — insight card comes in step 3`
-                : 'No tactical alert yet'}
-            </p>
-          </section>
+          <InsightCard
+            matchId={match.match_id}
+            alerts={replay.snapshot?.alerts ?? []}
+            audience={props.audience}
+            language={props.language}
+            teamNames={{ [home]: match.home.short_name, [away]: match.away.short_name }}
+          />
           <section className="card">
             <h2>Turning points</h2>
             <p className="muted">Comes in step 4</p>
