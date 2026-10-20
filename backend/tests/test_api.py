@@ -123,6 +123,20 @@ def test_opener_is_a_patient_move_with_no_recorded_ball_win():
     assert point["possession_start"] == "not_recorded" and point["turnover"] is None
 
 
+def test_turning_points_carry_their_build_up_events_for_the_pitch_view():
+    equaliser = turning_points(9999)[1]
+    chain = [e["event_id"] for e in equaliser["chain_events"]]
+    expected = set(equaliser["possession_event_ids"]) | set(equaliser["pressure_event_ids"]) | set(
+        equaliser["turnover"]["evidence_event_ids"]
+    )
+
+    assert set(chain) == expected
+    assert [e["timestamp_seconds"] for e in equaliser["chain_events"]] == sorted(
+        e["timestamp_seconds"] for e in equaliser["chain_events"]
+    )
+    assert all(e["timestamp_seconds"] <= equaliser["timestamp_seconds"] for e in equaliser["chain_events"])
+
+
 def test_only_the_equaliser_is_linked_to_the_pressing_alert():
     alerts = state(9999)["alerts"]
     opener, equaliser = turning_points(9999)

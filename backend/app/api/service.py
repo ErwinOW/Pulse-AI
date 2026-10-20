@@ -175,5 +175,9 @@ def turning_points_at(match_id: str, t: float) -> list[GoalTurningPoint]:
     for p in points:
         alerts, _ = _minute_products(match_id, float(int(p.timestamp_seconds // 60) * 60))
         ids = [a.alert_id for a in alerts if a.last_confirmed_s >= p.timestamp_seconds - ALERT_LINK_S]
-        linked.append(p.model_copy(update={"related_alert_ids": ids}))
+        chain_ids = set(p.possession_event_ids) | set(p.pressure_event_ids)
+        if p.turnover is not None:
+            chain_ids |= set(p.turnover.evidence_event_ids)
+        chain = [e.model_dump(mode="json") for e in match.events if e.event_id in chain_ids]
+        linked.append(p.model_copy(update={"related_alert_ids": ids, "chain_events": chain}))
     return linked

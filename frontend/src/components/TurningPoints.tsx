@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react'
-import { api } from '../api/client'
-import type { Alert, MatchState, TurningPoint } from '../api/types'
+import type { Alert, TurningPoint } from '../api/types'
 import { minuteOf } from '../format'
 import { hasKey, type T } from '../i18n'
 
 type Props = {
-  matchId: string
-  goals: MatchState['goals'] // goals before the current match time
+  points: TurningPoint[] // goals before the current match time
+  selectedId: string | null // goal drawn on the pitch
+  onSelect: (turningPointId: string) => void
   alerts: Alert[]
   homeId: string
   awayId: string
@@ -15,23 +14,7 @@ type Props = {
 }
 
 /** One line per goal: how the scoring move started, from the data (no AI). */
-export function TurningPoints({ matchId, goals, alerts, homeId, awayId, teamNames, t }: Props) {
-  const [byKey, setByKey] = useState<Record<string, TurningPoint[]>>({})
-  const lastGoalT = goals.at(-1)?.timestamp_seconds
-  const key = lastGoalT === undefined ? '' : `${matchId}|${lastGoalT}`
-  const points = byKey[key] ?? []
-
-  useEffect(() => {
-    if (lastGoalT === undefined || byKey[key]) return
-    const controller = new AbortController()
-    // Ask for turning points just after the latest goal: the API only returns goals before t.
-    api
-      .turningPoints(matchId, lastGoalT + 0.5, controller.signal)
-      .then((result) => setByKey((known) => ({ ...known, [key]: result })))
-      .catch(() => undefined) // the panel stays empty; the rest of the page still works
-    return () => controller.abort()
-  }, [matchId, lastGoalT, key, byKey])
-
+export function TurningPoints({ points, selectedId, onSelect, alerts, homeId, awayId, teamNames, t }: Props) {
   const name = (teamId: string) => teamNames[teamId] ?? teamId
   const alertTeam = (alertId: string) =>
     alerts.find((a) => a.alert_id === alertId)?.team_id ?? alertId.split('-')[1] ?? ''
@@ -39,7 +22,7 @@ export function TurningPoints({ matchId, goals, alerts, homeId, awayId, teamName
   return (
     <section className="card">
       <h2>{t('turningPoints')}</h2>
-      {goals.length === 0 || points.length === 0 ? (
+      {points.length === 0 ? (
         <p className="muted">{t('noGoals')}</p>
       ) : (
         <ol className="turning-points">
@@ -48,7 +31,7 @@ export function TurningPoints({ matchId, goals, alerts, homeId, awayId, teamName
             const seconds = Math.round(p.possession_duration_s)
             const zoneKey = `zone.${p.turnover?.zone}`
             return (
-              <li key={p.turning_point_id}>
+              <li key={p.turning_point_id} className={p.turning_point_id === selectedId ? 'tp-selected' : ''}>
                 <p className="tp-title">
                   {t('goalLine', {
                     minute: `${minuteOf(p.timestamp_seconds)}'`,
@@ -73,6 +56,9 @@ export function TurningPoints({ matchId, goals, alerts, homeId, awayId, teamName
                     {t('duringAlert', { team: name(alertTeam(alertId)) })}
                   </p>
                 ))}
+                <button className="tp-pitch" onClick={() => onSelect(p.turning_point_id)} aria-pressed={p.turning_point_id === selectedId}>
+                  {t('showOnPitch')}
+                </button>
               </li>
             )
           })}

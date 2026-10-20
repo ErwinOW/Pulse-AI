@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import type { Audience, Language, MatchSummary } from './api/types'
 import { EventFeed } from './components/EventFeed'
 import { InsightCard } from './components/InsightCard'
 import { MomentumChart } from './components/MomentumChart'
+import { PitchView } from './components/PitchView'
 import { StatsPanel } from './components/StatsPanel'
 import { TurningPoints } from './components/TurningPoints'
 import { clockLabel } from './format'
 import { useReplay } from './hooks/useReplay'
+import { useTurningPoints } from './hooks/useTurningPoints'
 import { translator } from './i18n'
 
 const SPEEDS = [1, 5, 10, 30, 60]
@@ -31,6 +34,8 @@ export function MatchView(props: Props) {
   const home = match.home.team_id
   const away = match.away.team_id
   const teamNames = { [home]: match.home.short_name, [away]: match.away.short_name }
+  const points = useTurningPoints(match.match_id, replay.snapshot?.goals ?? [])
+  const [pitchGoalId, setPitchGoalId] = useState<string | null>(null)
   const half = replay.ended
     ? t('fullTime')
     : replay.period === 1
@@ -131,6 +136,15 @@ export function MatchView(props: Props) {
       <div className="grid">
         <div className="column">
           <MomentumChart snapshot={replay.snapshot} home={match.home} away={match.away} audience={props.audience} t={t} />
+          <PitchView
+            matchId={match.match_id}
+            points={points}
+            selectedId={pitchGoalId}
+            alerts={replay.snapshot?.alerts ?? []}
+            home={match.home}
+            away={match.away}
+            t={t}
+          />
           <EventFeed events={replay.events} tags={replay.tags} teamNames={teamNames} audience={props.audience} t={t} />
         </div>
         <div className="column">
@@ -146,8 +160,9 @@ export function MatchView(props: Props) {
             <StatsPanel snapshot={replay.snapshot} home={match.home} away={match.away} language={language} t={t} />
           )}
           <TurningPoints
-            matchId={match.match_id}
-            goals={replay.snapshot?.goals ?? []}
+            points={points}
+            selectedId={pitchGoalId}
+            onSelect={setPitchGoalId}
             alerts={replay.snapshot?.alerts ?? []}
             homeId={home}
             awayId={away}

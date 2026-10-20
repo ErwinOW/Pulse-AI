@@ -428,6 +428,89 @@
   color: var(--text-muted);
 }
 
+.pitch {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.pitch-lines rect,
+.pitch-lines line,
+.pitch-lines circle {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-opacity: 0.45;
+  stroke-width: 0.3;
+}
+
+.pitch-lines > rect:first-child {
+  fill: var(--success-bg);
+  fill-opacity: 0.35;
+}
+
+.pitch-lines .pitch-spot {
+  fill: var(--text-muted);
+}
+
+.pitch-step {
+  font-size: 2.4px;
+  font-weight: 600;
+  fill: #fff;
+}
+
+.pitch-direction {
+  font-size: 2.8px;
+  fill: var(--text-muted);
+}
+
+.pitch-caption {
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.pitch-steps {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pitch-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-number {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pitch-legend {
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.tp-selected {
+  border-left: 3px solid var(--accent);
+  padding-left: 8px;
+}
+
+.tp-pitch {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 @media (max-width: 760px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);

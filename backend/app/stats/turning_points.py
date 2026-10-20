@@ -39,6 +39,7 @@ class GoalTurningPoint(BaseModel):
     turnover: Turnover | None  # how the ball was won, when recorded
     pressure_event_ids: list[str]  # scoring team's pressures just before the turnover
     related_alert_ids: list[str] = []  # filled by the API: alerts active before the goal
+    chain_events: list[dict] = []  # filled by the API: the events above, for drawing on a pitch
 
 
 def _controls_ball(event: Event) -> bool:

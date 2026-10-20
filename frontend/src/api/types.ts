@@ -212,4 +212,5 @@ export type TurningPoint = {
   } | null
   pressure_event_ids: string[]
   related_alert_ids: string[]
+  chain_events: MatchEvent[] // build-up events in match order, for the pitch view
 }
