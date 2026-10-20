@@ -2,6 +2,8 @@
 
 PULSE replays a football match and explains, in real time, **what changed and why it might matter**. A tactical detector watches the event stream minute by minute. When it finds a real shift (for example a team suddenly pressing much higher), an AI Storyteller agent turns the verified numbers into a short insight for **fans or analysts**, in **English or Bahasa Indonesia**. Every number in that text is checked automatically against the data before anyone sees it.
 
+**Who it's for:** broadcasters, club media teams and sports apps that want automated, multilingual match commentary they can **trust**: explainable, auditable, and safe to run unattended.
+
 **Live demo:** https://pulse-k9mh.onrender.com
 (free hosting: if nobody has visited for 15 minutes, the first load takes about a minute while the server wakes up)
 
@@ -17,6 +19,27 @@ PULSE replays a football match and explains, in real time, **what changed and wh
 - **Read the insight** when PULSE raises an alert, written for a **casual fan** or an **analyst**, in **English or Indonesian**. It's labelled "AI-written · fact-checked" or "Template text", with **evidence**: a before/now table and the exact events the text cites.
 - **Understand each goal:** turning points trace every goal back to how the move started (for example "won the ball after a pass lost under pressure in their own third, scored 8 s later").
 - **Analyst view** adds a numbers panel (last 5 minutes vs whole match), chart scale values and pitch zones.
+
+## Built to be trusted in production
+
+PULSE is designed around one rule: **AI may word the story, but it never decides the facts.** That is what makes automated commentary usable by a media business.
+
+| Need | How PULSE handles it |
+|---|---|
+| **Accuracy** | Statistics, detection and turning points are deterministic, tested Python. The AI only words a frozen fact sheet. A fact-checker rejects any unsupported number, uncited event, unhedged cause-and-effect or wrong-language formatting before publication. |
+| **Transparency** | Every insight is labelled ("AI-written · fact-checked" or "Template text" with the reason) and carries its evidence: the before/now numbers and the exact events cited. Model name and prompt version are recorded with each text. |
+| **Reliability** | The page never waits for the AI. Validated texts are cached, and if the model is slow, down or rejected twice, a template built from the same verified numbers is shown. The replay falls back from WebSocket to polling automatically. |
+| **Cost and abuse controls** | Live generation runs one at a time with a daily cap (20). Cached insights cost nothing to serve. The model is chosen by configuration, so it can be swapped without code changes. |
+| **No spoilers, no leakage** | Every view, alert, label and insight uses only events before the current match time, enforced by tests. Insights are frozen at detection time. |
+| **Auditability** | The detector was measured on unseen data with the decision rule fixed in advance (see below). Known weaknesses are kept as failing-by-design tests, not hidden. |
+| **Security** | API keys live only in environment variables and are never committed. The git history was scanned for secrets before publishing. |
+| **Operations** | One service, health-checked endpoint, configuration through environment variables, automatic redeploy on push, 165 automated tests. |
+
+### Path to adoption
+
+1. **Plug in a real event feed.** The event schema (passes, carries, shots, pressures, tackles...) follows standard football event data, so a provider feed needs an adapter, not a redesign. The detector must then be re-validated on real matches.
+2. **Add the next detectors** (for example a drop in pressing, or a team pinned back) using the same detect, fact-sheet, write, check pattern.
+3. **Production hardening still to do:** user authentication and per-customer rate limits, a persistent shared cache instead of a file, monitoring and alerting, and an editor review queue for publishers who want a human to approve AI texts.
 
 ## Architecture
 
