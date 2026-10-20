@@ -30,8 +30,12 @@ def cache_key(
 
 
 class InsightCache:
-    def __init__(self, path: Path = CACHE_FILE):
+    """Validated AI texts keyed by facts, audience, language, model and prompt version.
+    `entry_model` lets the same cache store other results (e.g. full-time reports)."""
+
+    def __init__(self, path: Path = CACHE_FILE, entry_model=Insight):
         self.path = path
+        self.entry_model = entry_model
         self.entries: dict[str, dict] = (
             json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
         )
@@ -39,7 +43,7 @@ class InsightCache:
     def get(self, facts: InsightFacts, audience: Audience, language: Language,
             model: str, prompt_version: str) -> Insight | None:
         entry = self.entries.get(cache_key(facts, audience, language, model, prompt_version))
-        return Insight.model_validate(entry) if entry else None
+        return self.entry_model.model_validate(entry) if entry else None
 
     def put(self, facts: InsightFacts, insight: Insight) -> bool:
         """Store a validated AI insight. Returns False (and stores nothing) for fallbacks."""

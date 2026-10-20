@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Audience, Language, MatchSummary } from './api/types'
 import { EventFeed } from './components/EventFeed'
+import { FullTimeReport } from './components/FullTimeReport'
 import { InsightCard } from './components/InsightCard'
 import { MomentumChart } from './components/MomentumChart'
 import { PitchView } from './components/PitchView'
@@ -148,6 +149,15 @@ export function MatchView(props: Props) {
           <EventFeed events={replay.events} tags={replay.tags} teamNames={teamNames} audience={props.audience} t={t} />
         </div>
         <div className="column">
+          {replay.ended && (
+            <FullTimeReport
+              matchId={match.match_id}
+              endT={match.duration_s + 1}
+              audience={props.audience}
+              language={language}
+              t={t}
+            />
+          )}
           <InsightCard
             matchId={match.match_id}
             alerts={replay.snapshot?.alerts ?? []}

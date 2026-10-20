@@ -1,6 +1,14 @@
 // Thin fetch wrapper for the PULSE API. In development Vite proxies /api to FastAPI;
 // in production VITE_API_URL can point at the backend when the frontend is hosted separately.
-import type { Audience, InsightResponse, Language, MatchState, MatchSummary, TurningPoint } from './types'
+import type {
+  Audience,
+  InsightResponse,
+  Language,
+  MatchState,
+  MatchSummary,
+  ReportResponse,
+  TurningPoint,
+} from './types'
 
 const API_BASE: string = import.meta.env.VITE_API_URL ?? ''
 
@@ -35,6 +43,11 @@ export const api = {
     getJson<TurningPoint[]>(`/api/matches/${encodeURIComponent(matchId)}/turning-points?t=${t}`, signal),
   insight: (matchId: string, alertId: string, audience: Audience, language: Language, signal?: AbortSignal) =>
     getJson<InsightResponse>(insightPath(matchId, alertId, audience, language), signal),
+  report: (matchId: string, t: number, audience: Audience, language: Language, signal?: AbortSignal) =>
+    getJson<ReportResponse>(
+      `/api/matches/${encodeURIComponent(matchId)}/report?${new URLSearchParams({ t: String(t), audience, language })}`,
+      signal,
+    ),
   regenerate: (matchId: string, alertId: string, audience: Audience, language: Language) =>
     getJson<InsightResponse>(insightPath(matchId, alertId, audience, language, '/regenerate'), undefined, 'POST'),
 }

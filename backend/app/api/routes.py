@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket
 
 from app.narrative.schema import Audience, Language
 from app.narrative.storyteller import Storyteller
+from app.report.service import ReportResponse, ReportService, get_report_service
 from app.stats import DEFINITIONS
 
 from . import replay, service
@@ -100,6 +101,21 @@ async def replay_match(
 ) -> None:
     """Live replay stream; see app/api/replay.py for the message protocol."""
     await replay.run_replay(websocket, match_id, speed, start)
+
+
+@router.get("/matches/{match_id}/report", response_model=ReportResponse)
+async def get_report(
+    match_id: str,
+    t: float = Query(ge=0, description="Match clock; the report exists only at full time"),
+    audience: Audience = "casual",
+    language: Language = "en",
+    reports: ReportService = Depends(get_report_service),
+) -> ReportResponse:
+    """Post-match commentary: cached validated AI text or the labelled template."""
+    match = _match_or_404(match_id)
+    if t < match.events[-1].timestamp_seconds:
+        raise HTTPException(status_code=409, detail="The full-time report is available at the final whistle.")
+    return await reports.get(match_id, audience, language)
 
 
 @router.get("/definitions")

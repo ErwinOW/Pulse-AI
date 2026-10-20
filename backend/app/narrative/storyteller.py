@@ -143,8 +143,9 @@ class AgentStoryteller:
             raise StorytellerError(f"{type(error).__name__}: {str(error)[:200]}") from error
 
 
-def storyteller_from_env(timeout_s: float | None = None) -> AgentStoryteller | None:
-    """Gemini via Agent Framework, or None when no key is configured (AI disabled)."""
+def chat_client_from_env(timeout_s: float | None = None):
+    """(Agent Framework chat client, model name, use_schema, timeout) for Gemini, or None
+    when no key is configured. Shared by every PULSE agent."""
     key, model = setting("GEMINI_API_KEY"), setting("GEMINI_MODEL")
     if not key or not model:
         return None
@@ -161,4 +162,13 @@ def storyteller_from_env(timeout_s: float | None = None) -> AgentStoryteller | N
     )
     client = OpenAIChatCompletionClient(model=model, async_client=sdk)
     use_schema = (setting("STORYTELLER_USE_SCHEMA", "true") or "true").lower() == "true"
+    return client, model, use_schema, timeout_s
+
+
+def storyteller_from_env(timeout_s: float | None = None) -> AgentStoryteller | None:
+    """Gemini via Agent Framework, or None when no key is configured (AI disabled)."""
+    config = chat_client_from_env(timeout_s)
+    if config is None:
+        return None
+    client, model, use_schema, timeout_s = config
     return AgentStoryteller(client, model_name=model, use_schema=use_schema, timeout_s=timeout_s)

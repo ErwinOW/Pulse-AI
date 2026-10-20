@@ -119,6 +119,7 @@ const en = {
   'third.defensive': 'own third',
   'third.middle': 'middle third',
   'third.final': 'attacking third',
+  fullTimeReport: 'Full-time report',
   // Pitch view
   pitch: 'On the pitch',
   pitchGoal: 'Goal build-up',
@@ -262,6 +263,7 @@ const id: Record<Key, string> = {
   'third.defensive': 'sepertiga pertahanan',
   'third.middle': 'sepertiga tengah',
   'third.final': 'sepertiga serang',
+  fullTimeReport: 'Laporan akhir laga',
   pitch: 'Di lapangan',
   pitchGoal: 'Proses gol',
   pitchPress: 'Peta pressing',

@@ -214,3 +214,26 @@ export type TurningPoint = {
   related_alert_ids: string[]
   chain_events: MatchEvent[] // build-up events in match order, for the pitch view
 }
+
+// Full-time report (backend/app/report).
+export type MatchReport = {
+  headline: string
+  moments: string[]
+  closing: string
+  metric_claims: { fact_id: string; value: number }[]
+}
+
+export type ReportResponse = {
+  report: {
+    report_id: string
+    audience: Audience
+    language: Language
+    report: MatchReport
+    source: 'ai' | 'fallback'
+    model: string | null
+    prompt_version: string | null
+    fallback_reason: string | null
+    generated_at: string
+  }
+  cached: boolean
+}
