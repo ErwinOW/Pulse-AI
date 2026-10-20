@@ -1,14 +1,16 @@
 # Render Blueprint for PULSE (free plan, no card).
-# One web service: FastAPI serves the API + WebSocket replay (and, later, the built frontend).
+# One web service: FastAPI serves the API, the WebSocket replay and the built dashboard.
+# Commands run from the repository root (no rootDir): the service needs backend/, data/ and
+# frontend/, and any change in them should redeploy. Native runtimes include Node/npm, so the
+# build also builds the dashboard (Node 24 by default). Python version: .python-version.
 # Secrets are entered in the Render dashboard on first Blueprint creation, never committed.
 services:
   - type: web
     name: pulse
     runtime: python
     plan: free
-    rootDir: backend
-    buildCommand: pip install -r requirements.lock
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r backend/requirements.lock && cd frontend && npm ci && npm run build
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
     autoDeployTrigger: commit
     envVars:
