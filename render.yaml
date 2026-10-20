@@ -1,0 +1,18 @@
+# Render Blueprint for PULSE (free plan, no card).
+# One web service: FastAPI serves the API + WebSocket replay (and, later, the built frontend).
+# Secrets are entered in the Render dashboard on first Blueprint creation, never committed.
+services:
+  - type: web
+    name: pulse
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.lock
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
