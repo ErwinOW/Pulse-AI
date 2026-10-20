@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket
 
 from app.narrative.schema import Audience, Language
 from app.narrative.storyteller import Storyteller
+from app.report.analyst import Analyst
+from app.report.ask_service import AskError, AskRequest, AskResponse, AskService, get_analyst, get_ask_service
 from app.report.service import ReportResponse, ReportService, get_report_service
 from app.stats import DEFINITIONS
 
@@ -116,6 +118,23 @@ async def get_report(
     if t < match.events[-1].timestamp_seconds:
         raise HTTPException(status_code=409, detail="The full-time report is available at the final whistle.")
     return await reports.get(match_id, audience, language)
+
+
+@router.post("/matches/{match_id}/ask", response_model=AskResponse)
+async def ask_analyst(
+    match_id: str,
+    request: AskRequest,
+    asks: AskService = Depends(get_ask_service),
+    analyst: Analyst | None = Depends(get_analyst),
+) -> AskResponse:
+    """Live question to the Analyst agent: tools -> fact check -> retry -> honest fallback."""
+    match = _match_or_404(match_id)
+    if request.t < match.events[-1].timestamp_seconds:
+        raise HTTPException(status_code=409, detail="Questions open at the final whistle.")
+    try:
+        return await asks.ask(match_id, request, analyst)
+    except AskError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.detail) from None
 
 
 @router.get("/definitions")
