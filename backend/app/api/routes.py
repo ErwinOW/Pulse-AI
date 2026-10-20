@@ -1,12 +1,12 @@
 """HTTP routes for matches and match state."""
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket
 
 from app.narrative.schema import Audience, Language
 from app.narrative.storyteller import Storyteller
 from app.stats import DEFINITIONS
 
-from . import service
+from . import replay, service
 from .insights import (
     InsightError,
     InsightResponse,
@@ -88,6 +88,17 @@ async def regenerate_insight(
         return await insights.regenerate(facts, audience, language, storyteller)
     except InsightError as error:
         raise HTTPException(status_code=error.status_code, detail=error.detail) from None
+
+
+@router.websocket("/matches/{match_id}/replay")
+async def replay_match(
+    websocket: WebSocket,
+    match_id: str,
+    speed: float = Query(10.0, ge=replay.MIN_SPEED, le=replay.MAX_SPEED),
+    start: float = Query(0.0, ge=0, alias="from"),
+) -> None:
+    """Live replay stream; see app/api/replay.py for the message protocol."""
+    await replay.run_replay(websocket, match_id, speed, start)
 
 
 @router.get("/definitions")

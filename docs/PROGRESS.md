@@ -73,12 +73,14 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - [x] 3.5 Live run (gemini-3.5-flash-lite, schema mode): review found validator gaps (causal phrasings, decimal commas in English, "21.0" counts, English terms leaking into Indonesian); fixed across validator v2 + prompts v2–v4. 4 validated AI insights (EN/ID × casual/analyst) cached in `data/narratives/cache.json`, prompt v4 — **122 passed, 3 xfailed**; commit `c3e2af0`
 - [x] 4a.1 API: fixture loading, `GET /api/matches`, `/api/matches/{id}`, `/api/matches/{id}/state?t=`, `/api/definitions`; state uses only events before t (alerts/momentum per completed minute, cached) — **131 passed, 3 xfailed**; commit `ed9ce71`
 - [x] 4a.2 Turning points: `GET /api/matches/{id}/turning-points?t=` — per goal: possession traced back, turnover (under pressure?) when recorded, scoring team's pressures, score before/after, alerts confirmed within 10 min before (timing link only) — **137 passed, 3 xfailed**; commit `5b2c4dc`
-- [x] 4a.3 Insight endpoints: `GET /api/matches/{id}/insights/{alert_id}?audience=&language=&t=` (cached validated AI or labelled fallback, never calls the model; 404 before the alert is raised) + `POST .../regenerate` (one at a time → 429, 20/day cap → 429, no key → 503; in-memory unless `PULSE_SAVE_CACHE=1`). Insights now use **detection-time facts** (the end-of-match alert version mentioned 70' confirmations → future leak during replay); cache regenerated with `run_live_insights --save --fresh`: 4/4 AI on first attempt, 2.6–3.1 s each (2026-10-20)
+- [x] 4a.3 Insight endpoints: `GET /api/matches/{id}/insights/{alert_id}?audience=&language=&t=` (cached validated AI or labelled fallback, never calls the model; 404 before the alert is raised) + `POST .../regenerate` (one at a time → 429, 20/day cap → 429, no key → 503; in-memory unless `PULSE_SAVE_CACHE=1`). Insights now use **detection-time facts** (the end-of-match alert version mentioned 70' confirmations → future leak during replay); cache regenerated with `run_live_insights --save --fresh`: 4/4 AI on first attempt, 2.6–3.1 s each — **148 passed, 3 xfailed**; commit `9d6eb26`
+- [x] 4a.4 `WS /api/matches/{id}/replay?speed=1-60&from=` — control / tick (only new events + new alerts, clock, score) / end / error messages; client commands pause, play, seek, speed; frontend falls back to polling `/state?t=` if a host blocks WebSockets — **154 passed, 3 xfailed** (2026-10-20). **Backend API complete.**
 
 ## Repository
 GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be public before submission** — check by Oct 26.
 
 ## Next actions (resume here)
-- 4a.4 `WS /api/matches/{id}/replay?speed=&from=`.
-- Then: React dashboard, free no-card hosting research, README (measured detector numbers + limitations), architecture diagram, demo video < 2 min.
+- Research free no-card hosting (WebSocket support, stays live to Nov 10) before building the dashboard.
+- React dashboard (WebSocket replay + polling fallback).
+- Then: README (measured detector numbers + limitations), architecture diagram, demo video < 2 min.
 - Note: without Azure, Foundry / Azure Cloud Native category prizes are out of reach; Agent Framework is the Microsoft hero technology
