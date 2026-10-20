@@ -1,104 +1,11 @@
 {
-  "939ee3695546eab6": {
+  "a8b64f8d3359f778": {
     "insight_id": "pressing_increase-EAS-1",
     "audience": "casual",
     "language": "en",
     "narrative": {
-      "headline": "Eastvale Athletic increases pressure on Northbridge FC",
-      "summary": "During minutes 58 to 62, Eastvale Athletic applied 11 high presses, reaching 2.2 high presses per minute compared to 0.3 per minute earlier in the match. Meanwhile, Northbridge FC recorded 8 turnovers under pressure and a pass completion rate of 61.9% in that same window.",
-      "event_ids": [
-        "demo-high-press-e1196",
-        "demo-high-press-e1198",
-        "demo-high-press-e1199",
-        "demo-high-press-e1200",
-        "demo-high-press-e1206"
-      ],
-      "metric_claims": [
-        {
-          "fact_id": "S1.recent_count",
-          "value": 11.0
-        },
-        {
-          "fact_id": "S1.recent",
-          "value": 2.2
-        },
-        {
-          "fact_id": "S1.baseline",
-          "value": 0.3
-        },
-        {
-          "fact_id": "S2.recent_count",
-          "value": 8.0
-        },
-        {
-          "fact_id": "S3.recent",
-          "value": 61.9
-        }
-      ],
-      "interpretation": "The surge in high pressing by Eastvale Athletic might have contributed to Northbridge FC struggling to maintain possession during those minutes.",
-      "confidence": "strong",
-      "is_hypothetical": false
-    },
-    "source": "ai",
-    "model": "gemini-3.5-flash-lite",
-    "prompt_version": "v4",
-    "attempts": 1,
-    "rejected_attempts": [],
-    "fallback_reason": null,
-    "generated_at": "2026-10-19T14:38:39+00:00"
-  },
-  "6479fa2ee5ae863a": {
-    "insight_id": "pressing_increase-EAS-1",
-    "audience": "casual",
-    "language": "id",
-    "narrative": {
-      "headline": "Eastvale Athletic meningkatkan intensitas pressing tinggi atas Northbridge FC",
-      "summary": "Eastvale Athletic mencatatkan 11 kali pressing tinggi dengan 2,2 per menit pada menit 58-62. Sementara itu, Northbridge FC mengalami 8 kehilangan bola di bawah tekanan dan akurasi umpan turun menjadi 61,9%.",
-      "event_ids": [
-        "demo-high-press-e1196",
-        "demo-high-press-e1198",
-        "demo-high-press-e1199",
-        "demo-high-press-e1200",
-        "demo-high-press-e1206",
-        "demo-high-press-e1208"
-      ],
-      "metric_claims": [
-        {
-          "fact_id": "S1.recent_count",
-          "value": 11.0
-        },
-        {
-          "fact_id": "S1.recent",
-          "value": 2.2
-        },
-        {
-          "fact_id": "S2.recent_count",
-          "value": 8.0
-        },
-        {
-          "fact_id": "S3.recent",
-          "value": 61.9
-        }
-      ],
-      "interpretation": "Lonjakan pressing tinggi ini mungkin membuat Northbridge FC kesulitan mengalirkan bola dengan lancar pada periode tersebut.",
-      "confidence": "strong",
-      "is_hypothetical": false
-    },
-    "source": "ai",
-    "model": "gemini-3.5-flash-lite",
-    "prompt_version": "v4",
-    "attempts": 1,
-    "rejected_attempts": [],
-    "fallback_reason": null,
-    "generated_at": "2026-10-19T14:38:45+00:00"
-  },
-  "fb08a5091e10ea37": {
-    "insight_id": "pressing_increase-EAS-1",
-    "audience": "analyst",
-    "language": "en",
-    "narrative": {
-      "headline": "Eastvale Athletic pressing volume rises as Northbridge FC build-up efficiency drops",
-      "summary": "During minutes 58 to 62, Eastvale Athletic registered 11 high presses totaling 2.2 high presses per minute compared to 0.3 high presses per minute across the baseline window of minutes 43 to 57 with 5 high presses. Northbridge FC recorded 8 turnovers under pressure and 1.6 turnovers under pressure per minute in the recent window, up from 0.4 turnovers under pressure per minute and 6 turnovers under pressure in the baseline window. Northbridge FC pass completion dropped to 61.9% from 88.4% while attempting 21 passes compared to 138 passes in the baseline window.",
+      "headline": "Eastvale Athletic ramps up pressure against Northbridge FC",
+      "summary": "Eastvale Athletic increased their pressure significantly, recording 2.2 high pressures per minute with a total of 11 high presses. Meanwhile, Northbridge FC completed 61.9% of their passes.",
       "event_ids": [
         "demo-high-press-e1196",
         "demo-high-press-e1198",
@@ -113,51 +20,15 @@
           "value": 2.2
         },
         {
-          "fact_id": "S1.baseline",
-          "value": 0.3
-        },
-        {
           "fact_id": "S1.recent_count",
           "value": 11.0
         },
         {
-          "fact_id": "S1.baseline_count",
-          "value": 5.0
-        },
-        {
-          "fact_id": "S2.recent",
-          "value": 1.6
-        },
-        {
-          "fact_id": "S2.baseline",
-          "value": 0.4
-        },
-        {
-          "fact_id": "S2.recent_count",
-          "value": 8.0
-        },
-        {
-          "fact_id": "S2.baseline_count",
-          "value": 6.0
-        },
-        {
           "fact_id": "S3.recent",
           "value": 61.9
-        },
-        {
-          "fact_id": "S3.baseline",
-          "value": 88.4
-        },
-        {
-          "fact_id": "S3.recent_count",
-          "value": 21.0
-        },
-        {
-          "fact_id": "S3.baseline_count",
-          "value": 138.0
         }
       ],
-      "interpretation": "The surge in Eastvale Athletic high presses might coincide with Northbridge FC experiencing lower passing accuracy and increased turnovers under pressure during the observed time windows.",
+      "interpretation": "The rising pressure might be linked to Northbridge FC struggling to maintain their usual passing accuracy.",
       "confidence": "strong",
       "is_hypothetical": false
     },
@@ -167,23 +38,20 @@
     "attempts": 1,
     "rejected_attempts": [],
     "fallback_reason": null,
-    "generated_at": "2026-10-19T14:38:52+00:00"
+    "generated_at": "2026-10-20T00:44:43+00:00"
   },
-  "fe58efee25078244": {
+  "dee68184fa72ef31": {
     "insight_id": "pressing_increase-EAS-1",
-    "audience": "analyst",
+    "audience": "casual",
     "language": "id",
     "narrative": {
-      "headline": "Intensitas pressing tinggi Eastvale Athletic pada menit 58",
-      "summary": "Pada menit 58 sampai 62, Eastvale Athletic mencatat 11 kali pressing tinggi dengan tingkat 2,2 per menit, naik dari 5 kali pressing tinggi atau 0,3 per menit pada 15 menit sebelumnya di menit 43 sampai 57. Sementara itu, Northbridge FC mengalami 8 kehilangan bola di bawah tekanan atau 1,6 per menit pada 5 menit terakhir, dibandingkan 6 kehilangan bola atau 0,4 per menit pada 15 menit sebelumnya. Akurasi umpan Northbridge FC tercatat 61,9% dari 21 umpan pada 5 menit terakhir, menurun dari 88,4% dari 138 umpan pada 15 menit sebelumnya.",
+      "headline": "Eastvale Athletic meningkatkan intensitas pressing",
+      "summary": "Eastvale Athletic mencatatkan 11 kali pressing tinggi dengan tingkat 2,2 per menit pada 5 menit terakhir, naik dari 5 kali pressing tinggi atau 0,3 per menit pada 15 menit sebelumnya. Pada waktu yang sama, Northbridge FC mengalami 8 kehilangan bola di bawah tekanan atau 1,6 per menit dan akurasi umpan 61,9%.",
       "event_ids": [
         "demo-high-press-e1196",
         "demo-high-press-e1198",
         "demo-high-press-e1199",
-        "demo-high-press-e1200",
-        "demo-high-press-e1206",
-        "demo-high-press-e1208",
-        "demo-high-press-e1210"
+        "demo-high-press-e1200"
       ],
       "metric_claims": [
         {
@@ -211,12 +79,146 @@
           "value": 1.6
         },
         {
-          "fact_id": "S2.baseline_count",
-          "value": 6.0
+          "fact_id": "S3.recent",
+          "value": 61.9
+        }
+      ],
+      "interpretation": "Peningkatan aktivitas pressing dari Eastvale Athletic mungkin berkaitan dengan menurunnya akurasi umpan Northbridge FC.",
+      "confidence": "strong",
+      "is_hypothetical": false
+    },
+    "source": "ai",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "v4",
+    "attempts": 1,
+    "rejected_attempts": [],
+    "fallback_reason": null,
+    "generated_at": "2026-10-20T00:44:50+00:00"
+  },
+  "c554078c26c18e1d": {
+    "insight_id": "pressing_increase-EAS-1",
+    "audience": "analyst",
+    "language": "en",
+    "narrative": {
+      "headline": "Eastvale Athletic High Press Activity and Northbridge FC Turnover Metrics",
+      "summary": "During minutes 58-62, Eastvale Athletic registered 2.2 high pressures per minute, totaling 11 high pressures, compared to a baseline window of minutes 43-57 where they recorded 0.3 high pressures per minute and 5 high pressures. Meanwhile, Northbridge FC recorded 1.6 turnovers under pressure per minute and 8 turnovers under pressure in the recent window, up from 0.4 turnovers under pressure per minute and 6 turnovers under pressure in the baseline window. Northbridge FC pass completion dropped to 61.9% from 21 passes attempted in the recent window, compared to 88.4% from 138 passes attempted in the baseline window.",
+      "event_ids": [
+        "demo-high-press-e1196",
+        "demo-high-press-e1198",
+        "demo-high-press-e1199",
+        "demo-high-press-e1200",
+        "demo-high-press-e1206",
+        "demo-high-press-e1208"
+      ],
+      "metric_claims": [
+        {
+          "fact_id": "S1.baseline",
+          "value": 0.3
+        },
+        {
+          "fact_id": "S1.baseline_count",
+          "value": 5.0
+        },
+        {
+          "fact_id": "S1.recent",
+          "value": 2.2
+        },
+        {
+          "fact_id": "S1.recent_count",
+          "value": 11.0
         },
         {
           "fact_id": "S2.baseline",
           "value": 0.4
+        },
+        {
+          "fact_id": "S2.baseline_count",
+          "value": 6.0
+        },
+        {
+          "fact_id": "S2.recent",
+          "value": 1.6
+        },
+        {
+          "fact_id": "S2.recent_count",
+          "value": 8.0
+        },
+        {
+          "fact_id": "S3.baseline",
+          "value": 88.4
+        },
+        {
+          "fact_id": "S3.baseline_count",
+          "value": 138.0
+        },
+        {
+          "fact_id": "S3.recent",
+          "value": 61.9
+        },
+        {
+          "fact_id": "S3.recent_count",
+          "value": 21.0
+        }
+      ],
+      "interpretation": "The data might indicate that increased pressing activity from Eastvale Athletic could coincide with a reduction in Northbridge FC passing accuracy and an increase in turnovers under pressure during the observed time windows.",
+      "confidence": "strong",
+      "is_hypothetical": false
+    },
+    "source": "ai",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "v4",
+    "attempts": 1,
+    "rejected_attempts": [],
+    "fallback_reason": null,
+    "generated_at": "2026-10-20T00:44:56+00:00"
+  },
+  "0dc0ff22e7079577": {
+    "insight_id": "pressing_increase-EAS-1",
+    "audience": "analyst",
+    "language": "id",
+    "narrative": {
+      "headline": "Intensitas pressing tinggi Eastvale Athletic meningkat pada menit 58",
+      "summary": "Pada skor Northbridge FC 1 dan Eastvale Athletic 0, Eastvale Athletic meningkatkan pressing tinggi pada 5 menit terakhir dari menit 58 hingga menit 62 dengan 2,2 per menit atau total 11 kali pressing tinggi. Angka ini naik dari 15 menit sebelumnya pada menit 43 hingga menit 57 yang mencatat 0,3 per menit atau 5 kali pressing tinggi. Northbridge FC mengalami kehilangan bola di bawah pressing sebanyak 1,6 per menit atau 8 kali pada 5 menit terakhir, dibandingkan 0,4 per menit atau 6 kali pada 15 menit sebelumnya. Akurasi umpan Northbridge FC tercatat 61,9% dari 21 umpan pada 5 menit terakhir, turun dari 88,4% dari 138 umpan pada 15 menit sebelumnya.",
+      "event_ids": [
+        "demo-high-press-e1196",
+        "demo-high-press-e1198",
+        "demo-high-press-e1199",
+        "demo-high-press-e1200",
+        "demo-high-press-e1206",
+        "demo-high-press-e1208"
+      ],
+      "metric_claims": [
+        {
+          "fact_id": "S1.recent",
+          "value": 2.2
+        },
+        {
+          "fact_id": "S1.recent_count",
+          "value": 11.0
+        },
+        {
+          "fact_id": "S1.baseline",
+          "value": 0.3
+        },
+        {
+          "fact_id": "S1.baseline_count",
+          "value": 5.0
+        },
+        {
+          "fact_id": "S2.recent",
+          "value": 1.6
+        },
+        {
+          "fact_id": "S2.recent_count",
+          "value": 8.0
+        },
+        {
+          "fact_id": "S2.baseline",
+          "value": 0.4
+        },
+        {
+          "fact_id": "S2.baseline_count",
+          "value": 6.0
         },
         {
           "fact_id": "S3.recent",
@@ -235,7 +237,7 @@
           "value": 138.0
         }
       ],
-      "interpretation": "Peningkatan intensitas pressing tinggi yang dilakukan oleh Eastvale Athletic bisa jadi membatasi operan Northbridge FC dan memicu lonjakan kehilangan bola di bawah tekanan pada periode tersebut.",
+      "interpretation": "Lonjakan pressing tinggi dari Eastvale Athletic mungkin berkaitan dengan penurunan akurasi umpan dan peningkatan kehilangan bola yang dialami Northbridge FC pada rentang waktu yang sama.",
       "confidence": "strong",
       "is_hypothetical": false
     },
@@ -245,6 +247,6 @@
     "attempts": 1,
     "rejected_attempts": [],
     "fallback_reason": null,
-    "generated_at": "2026-10-19T14:38:58+00:00"
+    "generated_at": "2026-10-20T00:45:03+00:00"
   }
 }

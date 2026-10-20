@@ -1,10 +1,20 @@
 """HTTP routes for matches and match state."""
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
+from app.narrative.schema import Audience, Language
+from app.narrative.storyteller import Storyteller
 from app.stats import DEFINITIONS
 
 from . import service
+from .insights import (
+    InsightError,
+    InsightResponse,
+    InsightService,
+    detection_facts,
+    get_insight_service,
+    get_storyteller,
+)
 
 router = APIRouter(prefix="/api")
 
@@ -40,6 +50,44 @@ def get_turning_points(
     match = _match_or_404(match_id)
     duration = match.events[-1].timestamp_seconds
     return service.turning_points_at(match_id, min(t, duration + 1))
+
+
+def _facts_or_404(match_id: str, alert_id: str, t: float | None):
+    _match_or_404(match_id)
+    try:
+        return detection_facts(match_id, alert_id, t)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"no alert {alert_id!r} by this time") from None
+
+
+@router.get("/matches/{match_id}/insights/{alert_id}", response_model=InsightResponse)
+async def get_insight(
+    match_id: str,
+    alert_id: str,
+    audience: Audience = "casual",
+    language: Language = "en",
+    t: float | None = Query(None, ge=0, description="Match clock; 404 if the alert is not raised yet"),
+    insights: InsightService = Depends(get_insight_service),
+) -> InsightResponse:
+    """Cached validated AI text, or the labelled deterministic fallback. Never calls the model."""
+    return await insights.get(_facts_or_404(match_id, alert_id, t), audience, language)
+
+
+@router.post("/matches/{match_id}/insights/{alert_id}/regenerate", response_model=InsightResponse)
+async def regenerate_insight(
+    match_id: str,
+    alert_id: str,
+    audience: Audience = "casual",
+    language: Language = "en",
+    insights: InsightService = Depends(get_insight_service),
+    storyteller: Storyteller | None = Depends(get_storyteller),
+) -> InsightResponse:
+    """Live write -> validate -> retry -> fallback; one at a time, capped per day."""
+    facts = _facts_or_404(match_id, alert_id, None)
+    try:
+        return await insights.regenerate(facts, audience, language, storyteller)
+    except InsightError as error:
+        raise HTTPException(status_code=error.status_code, detail=error.detail) from None
 
 
 @router.get("/definitions")

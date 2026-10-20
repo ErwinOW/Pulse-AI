@@ -4,6 +4,7 @@ Run from the backend folder (venv active):
     python -m scripts.run_live_insights
 
     python -m scripts.run_live_insights --save   # also store validated AI texts in the cache
+    python -m scripts.run_live_insights --save --fresh   # empty the cache first
 
 Makes at most 8 API requests (4 versions x up to 2 attempts), spaced out to
 respect free-tier per-minute limits. Prints what was shown, who wrote it, and
@@ -15,12 +16,10 @@ import os
 import sys
 import time
 
-from app.detection import detect_alerts
-from app.narrative import facts_from_alert
+from app.api.insights import detection_facts
 from app.narrative.cache import InsightCache
 from app.narrative.pipeline import generate_insight
 from app.narrative.storyteller import PROMPT_VERSION, storyteller_from_env
-from app.simulator import DEMO_HIGH_PRESS, generate
 
 PAUSE_S = 4.0
 OFFLINE_TIMEOUT_S = 45.0  # nobody is waiting during cache generation
@@ -35,14 +34,16 @@ async def main() -> None:
     print(f"Model: {storyteller.model_name} | output mode: {mode} "
           f"(set STORYTELLER_USE_SCHEMA=false to switch)")
 
-    match, _ = generate(DEMO_HIGH_PRESS)
-    (alert,) = detect_alerts(match.events, (match.home.team_id, match.away.team_id), 6000)
-    facts = facts_from_alert(match, alert)
+    # Same detection-time facts the API serves (committed fixture), so cache keys match.
+    facts = detection_facts("demo-high-press", "pressing_increase-EAS-1")
     save = "--save" in sys.argv
     store = InsightCache() if save else None
     if store is not None:
         removed = store.prune(PROMPT_VERSION)
-        print(f"Cache: removed {removed} entries from older prompt versions")
+        if "--fresh" in sys.argv:
+            removed += len(store.entries)
+            store.entries.clear()
+        print(f"Cache: removed {removed} old entries")
 
     for audience in ("casual", "analyst"):
         for language in ("en", "id"):
