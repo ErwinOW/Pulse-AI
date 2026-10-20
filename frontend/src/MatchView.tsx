@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Audience, Language, MatchSummary } from './api/types'
+import { AskAnalyst } from './components/AskAnalyst'
 import { EventFeed } from './components/EventFeed'
 import { FullTimeReport } from './components/FullTimeReport'
 import { InsightCard } from './components/InsightCard'
@@ -150,13 +151,23 @@ export function MatchView(props: Props) {
         </div>
         <div className="column">
           {replay.ended && (
-            <FullTimeReport
-              matchId={match.match_id}
-              endT={match.duration_s + 1}
-              audience={props.audience}
-              language={language}
-              t={t}
-            />
+            <>
+              <FullTimeReport
+                matchId={match.match_id}
+                endT={match.duration_s + 1}
+                audience={props.audience}
+                language={language}
+                t={t}
+              />
+              <AskAnalyst
+                key={match.match_id}
+                matchId={match.match_id}
+                endT={match.duration_s + 1}
+                audience={props.audience}
+                language={language}
+                t={t}
+              />
+            </>
           )}
           <InsightCard
             matchId={match.match_id}

@@ -215,6 +215,24 @@ export type TurningPoint = {
   chain_events: MatchEvent[] // build-up events in match order, for the pitch view
 }
 
+// Ask the analyst (backend/app/report/analyst.py, ask_service.py).
+export type AnswerResult = {
+  question: string
+  answer: string
+  source: 'ai' | 'declined' | 'fallback'
+  fallback_reason: string | null
+  looked_at: string[] // tool calls, e.g. "team_stats 45'-90'"
+  data_found: { value: number; label: string }[] // shown with a fallback
+  attempts: number
+  model: string | null
+}
+
+export type AskResponse = {
+  answer: AnswerResult
+  cached: boolean // a human-approved saved answer
+  model_calls_left_today: number
+}
+
 // Full-time report (backend/app/report).
 export type MatchReport = {
   headline: string

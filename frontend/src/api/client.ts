@@ -1,6 +1,7 @@
 // Thin fetch wrapper for the PULSE API. In development Vite proxies /api to FastAPI;
 // in production VITE_API_URL can point at the backend when the frontend is hosted separately.
 import type {
+  AskResponse,
   Audience,
   InsightResponse,
   Language,
@@ -20,8 +21,12 @@ export class ApiError extends Error {
   }
 }
 
-async function getJson<T>(path: string, signal?: AbortSignal, method = 'GET'): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, { signal, method })
+async function getJson<T>(path: string, signal?: AbortSignal, method = 'GET', body?: unknown): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    signal,
+    method,
+    ...(body === undefined ? {} : { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }),
+  })
   if (!response.ok) {
     let detail = `HTTP ${response.status}`
     try {
@@ -48,6 +53,15 @@ export const api = {
       `/api/matches/${encodeURIComponent(matchId)}/report?${new URLSearchParams({ t: String(t), audience, language })}`,
       signal,
     ),
+  suggestedQuestions: (language: Language, signal?: AbortSignal) =>
+    getJson<string[]>(`/api/suggested-questions?language=${language}`, signal),
+  ask: (matchId: string, question: string, t: number, audience: Audience, language: Language) =>
+    getJson<AskResponse>(`/api/matches/${encodeURIComponent(matchId)}/ask`, undefined, 'POST', {
+      question,
+      t,
+      audience,
+      language,
+    }),
   regenerate: (matchId: string, alertId: string, audience: Audience, language: Language) =>
     getJson<InsightResponse>(insightPath(matchId, alertId, audience, language, '/regenerate'), undefined, 'POST'),
 }
