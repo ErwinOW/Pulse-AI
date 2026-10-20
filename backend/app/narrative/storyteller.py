@@ -149,8 +149,9 @@ def chat_client_from_env(timeout_s: float | None = None):
     key, model = setting("GEMINI_API_KEY"), setting("GEMINI_MODEL")
     if not key or not model:
         return None
-    from agent_framework.openai import OpenAIChatCompletionClient
     from openai import AsyncOpenAI
+
+    from .gemini_client import GeminiChatClient
 
     timeout_s = timeout_s or float(setting("STORYTELLER_TIMEOUT_S", str(TIMEOUT_S)))
     model = model.removeprefix("models/")
@@ -160,7 +161,7 @@ def chat_client_from_env(timeout_s: float | None = None):
         api_key=key, base_url=setting("GEMINI_BASE_URL", DEFAULT_BASE_URL),
         max_retries=0, timeout=timeout_s,
     )
-    client = OpenAIChatCompletionClient(model=model, async_client=sdk)
+    client = GeminiChatClient(model=model, async_client=sdk)
     use_schema = (setting("STORYTELLER_USE_SCHEMA", "true") or "true").lower() == "true"
     return client, model, use_schema, timeout_s
 
