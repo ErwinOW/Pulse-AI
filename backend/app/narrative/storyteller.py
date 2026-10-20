@@ -24,7 +24,8 @@ TIMEOUT_S = 15.0
 # v2: explicit causal phrasings, decimal separators, ID wording
 # v3: rate units, no implied decisions/intent, fewer suggested stock phrases
 # v4: counts written as number + noun (v3 leaked the word "count"); output length cap
-PROMPT_VERSION = "v4"
+# v5: casual and analyst clearly different (casual: at most 2 numbers, counts not rates, fan headline)
+PROMPT_VERSION = "v5"
 MAX_OUTPUT_TOKENS = 900  # an insight never needs more; stops runaway generations
 
 INSTRUCTIONS = """You are PULSE's Storyteller: you turn verified football match facts into short,
@@ -51,9 +52,13 @@ Hard rules (your answer is checked automatically and rejected if any rule is bro
    tinggi", "21 passes" / "21 umpan" - never the word "count". Percentages get "%".
 
 Audiences:
-- casual: plain language, no jargon, explain why it matters; summary at most 2 sentences.
-- analyst: tactical terms, explicit time windows and before/after comparisons; summary at most
-  4 sentences.
+- casual: for fans. Plain, lively language like a match commentator; no metric names, no
+  "per minute" rates, no percentages. Use at most 2 numbers in the whole answer, and prefer
+  event totals (for example "11 high presses in 5 minutes, up from 5 in the 15 minutes before").
+  Headline: short and vivid, no numbers. Summary at most 2 sentences. The interpretation says,
+  hedged, why a fan should care.
+- analyst: tactical terms, explicit time windows (minutes) and before/after comparisons using
+  rates, totals and percentages; summary at most 4 sentences.
 
 Languages:
 - en: natural English.

@@ -10,8 +10,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { Alert, MatchState, TeamInfo } from '../api/types'
+import type { Alert, Audience, MatchState, TeamInfo } from '../api/types'
 import { minuteOf } from '../format'
+import type { T } from '../i18n'
 
 const FULL_MATCH_MIN = 90
 const TICKS = [15, 30, 45, 60, 75, 90]
@@ -21,6 +22,8 @@ type Props = {
   snapshot: MatchState | null
   home: TeamInfo
   away: TeamInfo
+  audience: Audience
+  t: T
 }
 
 type Point = { minute: number; diff: number | null }
@@ -31,7 +34,8 @@ type Point = { minute: number; diff: number | null }
  * favour the home team, below favour the away team. Alert windows are shaded and
  * goals marked on the scoring team's side. The x axis always spans the full match.
  */
-export function MomentumChart({ snapshot, home, away }: Props) {
+export function MomentumChart({ snapshot, home, away, audience, t }: Props) {
+  const analyst = audience === 'analyst'
   const byMinute = new Map((snapshot?.momentum ?? []).map((p) => [Math.round(p.end_s / 60), p.diff]))
   const points: Point[] = Array.from({ length: FULL_MATCH_MIN }, (_, i) => ({
     minute: i + 1,
@@ -47,15 +51,15 @@ export function MomentumChart({ snapshot, home, away }: Props) {
   return (
     <section className="card">
       <div className="card-header">
-        <h2>Who's on top</h2>
+        <h2>{analyst ? t('momentumAnalyst') : t('whoIsOnTop')}</h2>
         <div className="legend" aria-hidden="true">
           <span>
             <i className="swatch swatch-bar" style={{ background: 'var(--series-home)' }} />
-            {home.short_name} above
+            {t('above', { team: home.short_name })}
           </span>
           <span>
             <i className="swatch swatch-bar" style={{ background: 'var(--series-away)' }} />
-            {away.short_name} below
+            {t('below', { team: away.short_name })}
           </span>
         </div>
       </div>
@@ -65,10 +69,10 @@ export function MomentumChart({ snapshot, home, away }: Props) {
         aria-label={`Momentum balance by minute: bars above the middle line favour ${home.name}, below favour ${away.name}. ${alerts.length} alert window(s) and ${goals.length} goal(s) marked.`}
       >
         {byMinute.size === 0 ? (
-          <p className="muted chart-empty">The chart starts after the first minute.</p>
+          <p className="muted chart-empty">{t('chartEmpty')}</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={points} margin={{ top: 16, right: 8, bottom: 0, left: -28 }} barCategoryGap={1}>
+            <BarChart data={points} margin={{ top: 16, right: 8, bottom: 0, left: analyst ? -8 : -28 }} barCategoryGap={1}>
               <CartesianGrid stroke="var(--grid)" vertical={false} />
               <XAxis
                 dataKey="minute"
@@ -81,7 +85,8 @@ export function MomentumChart({ snapshot, home, away }: Props) {
               <YAxis
                 domain={[-scale, scale]}
                 ticks={[-scale, 0, scale]}
-                tickFormatter={() => ''}
+                tickFormatter={(v: number) => (analyst ? String(Math.abs(v)) : '')}
+                tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
                 stroke="var(--grid)"
                 width={36}
               />
@@ -94,7 +99,7 @@ export function MomentumChart({ snapshot, home, away }: Props) {
                   fillOpacity={0.12}
                   stroke="none"
                   label={{
-                    value: `${short(a.team_id)} press alert`,
+                    value: t('pressAlert', { team: short(a.team_id) }),
                     position: 'insideTop', // goal labels sit at the bottom for away goals; keep clear
                     fill: 'var(--text-muted)',
                     fontSize: 11,
@@ -109,7 +114,7 @@ export function MomentumChart({ snapshot, home, away }: Props) {
                   stroke="var(--text-muted)"
                   strokeDasharray="3 3"
                   label={{
-                    value: `${short(g.team_id)} goal`,
+                    value: t('goalMarker', { team: short(g.team_id) }),
                     position: isHome(g.team_id) ? 'insideTopLeft' : 'insideBottomLeft',
                     fill: 'var(--text-muted)',
                     fontSize: 11,
@@ -126,8 +131,8 @@ export function MomentumChart({ snapshot, home, away }: Props) {
                     <div className="chart-tooltip">
                       <strong>{point.minute}'</strong>{' '}
                       {leader
-                        ? `${leader.short_name} on top by ${Math.abs(point.diff).toFixed(1)}`
-                        : 'Even'}
+                        ? t('onTopBy', { team: leader.short_name, value: Math.abs(point.diff).toFixed(1) })
+                        : t('even')}
                     </div>
                   )
                 }}
@@ -146,10 +151,7 @@ export function MomentumChart({ snapshot, home, away }: Props) {
         <span className="chart-side chart-side-top">{home.short_name} ↑</span>
         <span className="chart-side chart-side-bottom">{away.short_name} ↓</span>
       </div>
-      <p className="chart-note muted">
-        Indicator, not a measurement: difference in weighted shots, box entries and final-third actions
-        over the last 5 minutes.
-      </p>
+      <p className="chart-note muted">{t('chartNote')}</p>
     </section>
   )
 }

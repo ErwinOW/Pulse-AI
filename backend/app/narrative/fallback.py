@@ -28,25 +28,30 @@ def fallback_narrative(facts: InsightFacts, audience: Audience, language: Langua
 
     team, opp = facts.team_name, facts.opponent_name
     r, bw = facts.recent_window_minutes, facts.baseline_window_minutes
-    hp, hp_base, hp_n = v("S1.recent"), v("S1.baseline"), v("S1.recent_count")
-    to, to_base, to_n = v("S2.recent"), v("S2.baseline"), v("S2.recent_count")
-
     if audience == "casual":
+        # Fans get at most 2 statistics, as event totals (the validator enforces this).
+        hp_n, hp_base_n = v("S1.recent_count"), v("S1.baseline_count")
+        s2 = facts.fact("S2.recent"), facts.fact("S2.baseline")
+        more_losses = all(f is not None and f.value is not None for f in s2) and s2[0].value > s2[1].value
         if language == "en":
             headline = f"{team} turn up the pressure on {opp}"
-            summary = (f"Over the last {r} minutes, {team} pressed high {hp_n} times ({hp} per minute, "
-                       f"up from {hp_base} per minute in the {bw} minutes before). {opp} lost the "
-                       f"ball under pressure {to_n} times in that spell.")
+            summary = (f"In the last {r} minutes, {team} pressed high {hp_n} times, compared with "
+                       f"{hp_base_n} times in the {bw} minutes before.")
+            if more_losses:
+                summary += f" {opp} also lost the ball under pressure more often in that spell."
             interpretation = (f"This may make it harder for {opp} to play out from the back. "
                               "Event data shows the pattern, not the coach's intent.")
         else:
             headline = f"{team} meningkatkan tekanan terhadap {opp}"
-            summary = (f"Dalam {r} menit terakhir, {team} melakukan pressing tinggi sebanyak {hp_n} kali "
-                       f"({hp} per menit, naik dari {hp_base} per menit pada {bw} menit sebelumnya). "
-                       f"{opp} kehilangan bola di bawah tekanan sebanyak {to_n} kali pada periode itu.")
+            summary = (f"Dalam {r} menit terakhir, {team} melakukan pressing tinggi sebanyak {hp_n} kali, "
+                       f"dibanding {hp_base_n} kali pada {bw} menit sebelumnya.")
+            if more_losses:
+                summary += f" {opp} juga lebih sering kehilangan bola saat ditekan pada periode itu."
             interpretation = (f"Hal ini mungkin menyulitkan {opp} membangun serangan dari belakang. "
                               "Data event menunjukkan polanya, bukan niat pelatih.")
     else:
+        hp, hp_base, hp_n = v("S1.recent"), v("S1.baseline"), v("S1.recent_count")
+        to, to_base, to_n = v("S2.recent"), v("S2.baseline"), v("S2.recent_count")
         pc, pc_base, pc_n = v("S3.recent"), v("S3.baseline"), v("S3.recent_count")
         if language == "en":
             headline = f"Pressing increase: {team} from minute {facts.onset_minute}"

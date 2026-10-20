@@ -77,14 +77,15 @@ fastapi 0.143.3 · uvicorn 0.54.0 · pydantic 2.14.1 · pytest 9.1.1 · httpx 0.
 - [x] 4a.4 `WS /api/matches/{id}/replay?speed=1-60&from=` — control / tick (only new events + new alerts, clock, score) / end / error messages; client commands pause, play, seek, speed; frontend falls back to polling `/state?t=` if a host blocks WebSockets — **154 passed, 3 xfailed** (2026-10-20). **Backend API complete.**; commit `ed44e9d`
 - [x] 5.0 Hosting: Render free web service (no card asked), Blueprint `render.yaml` + `.python-version` 3.13; live at **https://pulse-k9mh.onrender.com** — health, matches, state, turning points, cached insight, WebSocket replay all verified 2026-10-20 (commit `43f9bbf`). Free plan: sleeps after 15 min idle, ~1 min wake. Replay ticks ~0.6 s instead of 0.25 s on the free CPU (precompute minute products at startup — deferred). Plan B: static GitHub Pages.
 - [x] 6.1 Dashboard step 1: API types/client, `useReplay` (WebSocket + polling fallback, starts paused), page frame (score, clock, controls, audience/language/match pickers). Key-event labels (user request: show meaningful events, not every pass): `app/stats/key_events.py` — goal, shot, key_pass, box_entry, ball_won_high, lost_under_pressure, winning_press, foul, substitution, period; each label has `revealed_s` (no future); ~15% of events. `/state` sends `key_events` + `event_tags`, ticks send `new_tags`. Feed defaults to Key events with All events toggle; verified in browser — **161 passed, 3 xfailed**, lint + build clean; commit `a3e094f` (2026-10-20)
+- [x] 6.2 Momentum chart (Recharts): diverging bars per minute (home above / away below the middle line, user's request), alert window shaded, goal markers; `/state` sends `goals`; commit `66c0998`
+- [x] 6.3 Insight card: cached/fallback text per audience + language, source labels, evidence table (before vs now + counts) and cited events (`evidence_events` in insight API), regenerate with busy/limit messages — **162 passed, 3 xfailed**; commit `1ea322f`
+- [x] 6.4 Turning points panel, full EN/ID UI strings (`src/i18n.ts`, `<html lang>`), two-row controls (wide timeline), phone layout; checked EN + ID + mobile in browser (2026-10-21)
 
 ## Repository
 GitHub: https://github.com/ErwinOW/Pulse-AI (pushed 2026-10-18). **Must be public before submission** — check by Oct 26.
 
 ## Next actions (resume here)
-- Dashboard step 2 (rest): momentum chart with Recharts (`npm install recharts` — approved), alert window shading + goal markers.
-- Step 3: insight card (audience/language, source labels, evidence highlight in feed, regenerate with 429/503 messages).
-- Step 4: turning points, EN/ID UI labels, layout fix (timeline slider too narrow), mobile + dark mode check.
-- Step 5: deploy frontend (decide: Render static site vs served by backend), optional replay speed fix.
+- Step 5: deploy frontend (decide: Render static site vs served by backend) + check live end to end; optional replay speed fix (precompute minute products at startup).
+- User to review Indonesian UI wording (src/i18n.ts).
 - Then: README (measured detector numbers + limitations), architecture diagram, demo video < 2 min; make repo public by Oct 26.
 - Note: without Azure, Foundry / Azure Cloud Native category prizes are out of reach; Agent Framework is the Microsoft hero technology

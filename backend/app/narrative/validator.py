@@ -14,7 +14,7 @@ Indonesian decimals use a comma (71,4%), so both separators are accepted.
 import re
 
 from .facts import InsightFacts, match_minute
-from .schema import Language, Narrative, ValidationResult
+from .schema import Audience, Language, Narrative, ValidationResult
 
 NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
@@ -77,8 +77,19 @@ def numbers_in(text: str) -> list[float]:
     return [float(m.replace(",", ".")) for m in NUMBER_RE.findall(text)]
 
 
+CASUAL_MAX_CLAIMS = 2
+
+
+def context_numbers(facts: InsightFacts) -> set[float]:
+    """Minutes, window lengths and the score: allowed in any text without a metric claim."""
+    return {float(n) for n in (facts.onset_minute, facts.detected_minute, facts.last_confirmed_minute,
+                               facts.recent_window_minutes, facts.baseline_window_minutes,
+                               *facts.score.values())}
+
+
 def validate(
-    narrative: Narrative, facts: InsightFacts, language: Language | None = None
+    narrative: Narrative, facts: InsightFacts, language: Language | None = None,
+    audience: Audience | None = None,
 ) -> ValidationResult:
     problems: list[str] = []
 
@@ -140,5 +151,23 @@ def validate(
         problems.append("hypothetical wording present but is_hypothetical is false")
     if narrative.is_hypothetical and facts.kind == "pressing_increase":
         problems.append("an observed pattern cannot be marked hypothetical")
+
+    # 7. Casual readers get at most 2 statistics, as event totals (no rates or percentages)
+    if audience == "casual":
+        if len(narrative.metric_claims) > CASUAL_MAX_CLAIMS:
+            problems.append(f"casual text uses {len(narrative.metric_claims)} statistics; "
+                            f"use at most {CASUAL_MAX_CLAIMS}")
+        claimed: set[float] = set()
+        for claim in narrative.metric_claims:
+            fact = facts.fact(claim.fact_id)
+            if fact is not None and fact.unit != "count":
+                problems.append(f"casual text must use event totals, not {fact.unit} ({claim.fact_id})")
+            claimed.add(float(claim.value))
+        ok_numbers = claimed | context_numbers(facts)
+        for field in ("headline", "summary", "interpretation"):
+            for number in numbers_in(getattr(narrative, field)):
+                if not any(abs(number - a) < 1e-6 for a in ok_numbers):
+                    problems.append(f"{field}: casual text may only use the claimed totals, "
+                                    f"not {number:g}")
 
     return ValidationResult(ok=not problems, problems=problems)

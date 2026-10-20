@@ -190,3 +190,26 @@ export type InsightResponse = {
   regenerations_left_today: number
   evidence_events: MatchEvent[]
 }
+
+// Goal turning points (backend/app/stats/turning_points.py).
+export type TurningPoint = {
+  turning_point_id: string
+  team_id: string
+  goal_event_id: string
+  timestamp_seconds: number
+  score_before: Record<string, number>
+  score_after: Record<string, number>
+  possession_event_ids: string[]
+  possession_duration_s: number
+  possession_passes: number
+  possession_start: 'turnover' | 'not_recorded'
+  turnover: {
+    lost_by: string
+    won_by: string
+    zone: 'defensive' | 'middle' | 'final'
+    under_pressure: boolean
+    evidence_event_ids: string[]
+  } | null
+  pressure_event_ids: string[]
+  related_alert_ids: string[]
+}

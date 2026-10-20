@@ -70,14 +70,22 @@
 .clock {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+  min-width: 120px;
 }
 
 .controls {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.timeline-row,
+.options-row {
+  display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 12px 0;
 }
 
 .controls label {
@@ -87,9 +95,13 @@
   color: var(--text-muted);
 }
 
+.play {
+  min-width: 64px;
+}
+
 .timeline {
   flex: 1;
-  min-width: 160px;
+  min-width: 200px;
 }
 
 .transport {
@@ -366,8 +378,62 @@
   font-size: 12px;
 }
 
+.turning-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.turning-points p {
+  margin: 2px 0;
+}
+
+.tp-title {
+  font-weight: 500;
+}
+
+.tp-alert {
+  font-size: 13px;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-table th,
+.stats-table td {
+  text-align: right;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+
+.stats-table th[scope='row'],
+.stats-table thead th:first-child {
+  text-align: left;
+}
+
+.stats-table thead th {
+  font-weight: 500;
+}
+
+.feed-where {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 @media (max-width: 760px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scoreboard .spacer {
+    flex-basis: 100%; /* teams and score on their own line */
   }
 }

@@ -63,7 +63,7 @@ async def generate_insight(
         except StorytellerError as error:
             return fallback(f"ai_error: {error}", attempt)
 
-        result = validate(narrative, facts, language)
+        result = validate(narrative, facts, language, audience)
         if result.ok:
             return Insight(
                 insight_id=facts.insight_id, audience=audience, language=language,

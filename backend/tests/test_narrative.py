@@ -73,9 +73,28 @@ def test_fact_sheet_confidence_matches_its_own_signals():
 @pytest.mark.parametrize(("audience", "language"), COMBOS)
 def test_fallback_narratives_pass_validation(audience, language):
     narrative = fallback_narrative(demo_facts(), audience, language)
-    result = validate(narrative, demo_facts(), language)
+    result = validate(narrative, demo_facts(), language, audience)
 
     assert result.ok, result.problems
+
+
+def test_casual_text_is_limited_to_two_totals():
+    facts = demo_facts()
+    casual = fallback_narrative(facts, "casual", "en")
+    rates = casual.model_copy(update={
+        "summary": f"{facts.team_name} pressed high 2.2 per minute.",
+        "metric_claims": [MetricClaim(fact_id="S1.recent", value=2.2)],
+    })
+    too_many = casual.model_copy(update={
+        "metric_claims": [MetricClaim(fact_id=f, value=facts.fact(f).value)
+                          for f in ("S1.recent_count", "S1.baseline_count", "S2.recent_count")],
+    })
+
+    assert len(casual.metric_claims) <= 2
+    assert all(facts.fact(c.fact_id).unit == "count" for c in casual.metric_claims)
+    assert any("event totals" in p for p in validate(rates, facts, "en", "casual").problems)
+    assert any("at most 2" in p for p in validate(too_many, facts, "en", "casual").problems)
+    assert validate(rates, facts, "en", "analyst").ok  # analysts may use rates
 
 
 def test_audiences_differ_but_share_the_same_facts():

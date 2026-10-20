@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import type { Alert, Audience, InsightResponse, Language, MetricFact } from '../api/types'
 import { clockLabel, describeEvent, minuteOf } from '../format'
+import { hasKey, metricKey, type T } from '../i18n'
 
 type Props = {
   matchId: string
@@ -9,26 +10,23 @@ type Props = {
   audience: Audience
   language: Language
   teamNames: Record<string, string>
+  t: T
 }
 
-const FALLBACK_REASONS: Record<string, string> = {
-  not_generated_yet: 'AI version not generated yet',
-  ai_disabled: 'AI is not configured on this server',
-  validation_failed: "The AI draft didn't pass the fact check",
+function fallbackReason(reason: string | null, t: T): string {
+  if (!reason) return t('templateText')
+  const key = `reason.${reason}`
+  return hasKey(key) ? t(key) : t('reason.other')
 }
 
-function fallbackReason(reason: string | null): string {
-  if (!reason) return 'Template text'
-  return FALLBACK_REASONS[reason] ?? 'AI was unavailable'
-}
-
-export function InsightCard({ matchId, alerts, audience, language, teamNames }: Props) {
+export function InsightCard({ matchId, alerts, audience, language, teamNames, t }: Props) {
   const [chosenId, setChosenId] = useState<string | null>(null)
   const [responses, setResponses] = useState<Record<string, InsightResponse>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [regenerating, setRegenerating] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
-  const [showEvidence, setShowEvidence] = useState(false)
+  const [evidenceChoice, setEvidenceChoice] = useState<boolean | null>(null)
+  const showEvidence = evidenceChoice ?? audience === 'analyst' // analysts see the numbers first
 
   const alert = alerts.find((a) => a.alert_id === chosenId) ?? alerts.at(-1) ?? null
   const key = alert ? `${alert.alert_id}|${audience}|${language}` : ''
@@ -53,8 +51,8 @@ export function InsightCard({ matchId, alerts, audience, language, teamNames }: 
   if (!alert) {
     return (
       <section className="card">
-        <h2>Insight</h2>
-        <p className="muted">No tactical alert yet. PULSE checks for pressing shifts every match minute.</p>
+        <h2>{t('insight')}</h2>
+        <p className="muted">{t('noAlert')}</p>
       </section>
     )
   }
@@ -66,7 +64,7 @@ export function InsightCard({ matchId, alerts, audience, language, teamNames }: 
     try {
       const response = await api.regenerate(matchId, alert.alert_id, audience, language)
       setResponses((known) => ({ ...known, [key]: response }))
-      if (response.insight.source !== 'ai') setNotice(`${fallbackReason(response.insight.fallback_reason)}. Showing the template text.`)
+      if (response.insight.source !== 'ai') setNotice(t('showingTemplate', { reason: fallbackReason(response.insight.fallback_reason, t) }))
     } catch (e) {
       setNotice(e instanceof Error ? e.message : String(e))
     } finally {
@@ -80,7 +78,7 @@ export function InsightCard({ matchId, alerts, audience, language, teamNames }: 
   return (
     <section className="card insight">
       {alerts.length > 1 && (
-        <div className="segmented alert-picker" role="group" aria-label="Choose alert">
+        <div className="segmented alert-picker" role="group" aria-label={t('chooseAlert')}>
           {alerts.map((a) => (
             <button key={a.alert_id} aria-pressed={a.alert_id === alert.alert_id} onClick={() => setChosenId(a.alert_id)}>
               {teamNames[a.team_id] ?? a.team_id} {minuteOf(a.first_detected_s)}'
@@ -89,17 +87,19 @@ export function InsightCard({ matchId, alerts, audience, language, teamNames }: 
         </div>
       )}
       <div className="insight-meta">
-        <span className="badge badge-accent">Alert {minuteOf(alert.first_detected_s)}'</span>
+        <span className="badge badge-accent">{t('alertAt', { minute: `${minuteOf(alert.first_detected_s)}'` })}</span>
         <span className="muted">
-          {data ? `${data.facts.confidence === 'strong' ? 'Strong' : 'Moderate'} · ${data.facts.signals_met.length}/${totalSignals} signals` : ''}
+          {data
+            ? `${data.facts.confidence === 'strong' ? t('strong') : t('moderate')} · ${t('signals', { met: data.facts.signals_met.length, total: totalSignals })}`
+            : ''}
         </span>
         <span className="muted">
-          {alert.active ? 'Still active' : `Last confirmed ${minuteOf(alert.last_confirmed_s)}'`}
+          {alert.active ? t('stillActive') : t('lastConfirmed', { minute: `${minuteOf(alert.last_confirmed_s)}'` })}
         </span>
       </div>
 
-      {error && <p className="error">Couldn't load the insight ({error}).</p>}
-      {!data && !error && <p className="muted">Loading insight…</p>}
+      {error && <p className="error">{t('insightError', { detail: error })}</p>}
+      {!data && !error && <p className="muted">{t('loadingInsight')}</p>}
       {data && (
         <>
           <h3 className="insight-headline">{data.insight.narrative.headline}</h3>
@@ -113,27 +113,27 @@ export function InsightCard({ matchId, alerts, audience, language, teamNames }: 
                 className="badge badge-success"
                 title={`${data.insight.model}, prompt ${data.insight.prompt_version}, ${data.insight.attempts} attempt(s), ${data.cached ? 'saved' : 'new'} ${data.insight.generated_at}`}
               >
-                AI-written · fact-checked
+                {t('aiWritten')}
               </span>
             ) : (
-              <span className="badge badge-muted" title="Deterministic template filled with the verified numbers">
-                Template text · {fallbackReason(data.insight.fallback_reason)}
+              <span className="badge badge-muted" title={t('templateTitle')}>
+                {t('templateText')} · {fallbackReason(data.insight.fallback_reason, t)}
               </span>
             )}
-            <button onClick={() => setShowEvidence((v) => !v)} aria-expanded={showEvidence}>
-              {showEvidence ? 'Hide evidence' : 'Show evidence'}
+            <button onClick={() => setEvidenceChoice(!showEvidence)} aria-expanded={showEvidence}>
+              {showEvidence ? t('hideEvidence') : t('showEvidence')}
             </button>
             <button
               onClick={regenerate}
               disabled={regenerating}
-              title={`Ask the AI agent for a new version. It is fact-checked before it is shown. ${data.regenerations_left_today} left today.`}
+              title={t('regenerateTitle', { n: data.regenerations_left_today })}
             >
-              {regenerating ? 'Writing…' : 'Regenerate'}
+              {regenerating ? t('writing') : t('regenerate')}
             </button>
           </div>
           {notice && <p className="muted insight-notice">{notice}</p>}
 
-          {showEvidence && <Evidence data={data} number={number} teamNames={teamNames} />}
+          {showEvidence && <Evidence data={data} number={number} teamNames={teamNames} t={t} />}
         </>
       )}
     </section>
@@ -144,10 +144,12 @@ function Evidence({
   data,
   number,
   teamNames,
+  t,
 }: {
   data: InsightResponse
   number: Intl.NumberFormat
   teamNames: Record<string, string>
+  t: T
 }) {
   const facts = new Map(data.facts.facts.map((f) => [f.fact_id, f]))
   const signalIds = [...new Set(data.facts.facts.map((f) => f.fact_id.split('.')[0]))]
@@ -156,10 +158,15 @@ function Evidence({
   const value = (f: MetricFact | undefined) => {
     if (!f || f.value === null) return '–'
     if (f.unit === 'percent') return `${number.format(f.value)}%`
-    if (f.unit === 'per_min') return `${number.format(f.value)}/min`
+    if (f.unit === 'per_min') return `${number.format(f.value)}${t('perMin')}`
     return number.format(f.value)
   }
   const span = (f: MetricFact | undefined) => (f ? `${minuteOf(f.window_start_s)}'–${minuteOf(f.window_end_s) - 1}'` : '')
+  const label = (f: MetricFact | undefined) => {
+    if (!f) return ''
+    const key = metricKey(f.metric_id)
+    return hasKey(key) ? t(key, { team: teamNames[f.team_id] ?? f.team_id }) : f.label.split(' (')[0]
+  }
   const first = facts.get(`${signalIds[0]}.baseline`)
   const firstRecent = facts.get(`${signalIds[0]}.recent`)
 
@@ -168,9 +175,9 @@ function Evidence({
       <table className="evidence-table">
         <thead>
           <tr>
-            <th scope="col">Signal</th>
-            <th scope="col">Before ({span(first)})</th>
-            <th scope="col">Now ({span(firstRecent)})</th>
+            <th scope="col">{t('signal')}</th>
+            <th scope="col">{t('before', { span: span(first) })}</th>
+            <th scope="col">{t('now', { span: span(firstRecent) })}</th>
           </tr>
         </thead>
         <tbody>
@@ -179,7 +186,7 @@ function Evidence({
             const now = facts.get(`${id}.recent`)
             return (
               <tr key={id}>
-                <td>{now?.label.split(' (')[0]}</td>
+                <td>{label(now)}</td>
                 <td>
                   {value(before)} <span className="muted">({value(facts.get(`${id}.baseline_count`))})</span>
                 </td>
@@ -191,21 +198,21 @@ function Evidence({
           })}
         </tbody>
       </table>
-      <p className="muted evidence-caption">Counts in brackets. Every number in the text is checked against this table.</p>
+      <p className="muted evidence-caption">{t('countsNote')}</p>
 
-      {citedEvents.length > 0 && <h4>Events cited in the text</h4>}
+      {citedEvents.length > 0 && <h4>{t('citedEvents')}</h4>}
       <ol className="feed">
         {citedEvents.map((e) => (
             <li key={e.event_id}>
               <span className="feed-time">{clockLabel(e.timestamp_seconds)}</span>
               <span className="feed-team">{e.team_id ? teamNames[e.team_id] ?? e.team_id : ''}</span>
-              <span className="feed-text">{describeEvent(e)}</span>
-              {e.under_pressure && <span className="tag tag-press">Under pressure</span>}
+              <span className="feed-text">{describeEvent(e, t)}</span>
+              {e.under_pressure && <span className="tag tag-press">{t('underPressure')}</span>}
             </li>
           ))}
       </ol>
       <p className="muted evidence-caption">
-        The alert is backed by {data.facts.evidence_event_ids.length} events in total.
+        {t('backedBy', { n: data.facts.evidence_event_ids.length })}
       </p>
     </div>
   )
