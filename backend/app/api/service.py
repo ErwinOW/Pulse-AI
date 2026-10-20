@@ -73,6 +73,7 @@ class MatchState(BaseModel):
     window: WindowStats  # last 5 minutes before t
     totals: WindowStats  # kick-off to t
     momentum: list[MomentumPoint]  # per completed minute
+    goals: list[dict]  # goal shots before t (for chart markers), oldest first
     alerts: list[Alert]  # raised by the last completed minute
 
 
@@ -155,6 +156,10 @@ def state_at(match_id: str, t: float) -> MatchState:
         window=compute_window(events, teams, max(0.0, t - STATS_WINDOW_S), t),
         totals=compute_window(events, teams, 0.0, t),
         momentum=momentum,
+        goals=[
+            {"event_id": e.event_id, "team_id": e.team_id, "timestamp_seconds": e.timestamp_seconds}
+            for e in events if e.event_type == "shot" and e.outcome == "goal"
+        ],
         alerts=alerts,
     )
 

@@ -12,8 +12,10 @@
   --success-bg: #eaf3de;
   --danger: #a32d2d;
   --danger-bg: #fcebeb;
-  --home: #378add;
-  --away: #d85a30;
+  /* Team series colours: validated categorical slots 1-2 (dataviz reference palette). */
+  --series-home: #2a78d6;
+  --series-away: #eb6834;
+  --grid: #ecebe7;
   --radius: 10px;
 
   font: 15px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -38,6 +40,9 @@
     --success-bg: #27500a;
     --danger: #f7c1c1;
     --danger-bg: #791f1f;
+    --series-home: #3987e5;
+    --series-away: #d95926;
+    --grid: #2a2926;
   }
 }
 

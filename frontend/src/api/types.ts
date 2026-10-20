@@ -104,6 +104,7 @@ export type MatchState = {
   window: WindowStats
   totals: WindowStats
   momentum: MomentumPoint[]
+  goals: { event_id: string; team_id: string; timestamp_seconds: number }[]
   alerts: Alert[]
 }
 

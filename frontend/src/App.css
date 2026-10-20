@@ -204,6 +204,70 @@
   border: 1px solid var(--border);
 }
 
+.legend {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.swatch-bar {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.chart {
+  height: 220px;
+  position: relative;
+}
+
+.chart-side {
+  position: absolute;
+  left: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.chart-side-top {
+  top: 14px;
+}
+
+.chart-side-bottom {
+  bottom: 28px;
+}
+
+.chart-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.chart-empty {
+  padding-top: 90px;
+  text-align: center;
+}
+
+.chart-note {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 @media (max-width: 760px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);

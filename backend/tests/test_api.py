@@ -50,6 +50,7 @@ def test_state_at_50_minutes_contains_nothing_from_the_future():
     assert all(p["end_s"] <= t for p in s["momentum"])
     assert s["window"]["end_s"] == t and s["totals"]["end_s"] == t
     assert s["score"] == {"NBR": 1, "EAS": 0}  # Northbridge scored ~35', equaliser comes ~64'
+    assert [g["team_id"] for g in s["goals"]] == ["NBR"]
     assert s["alerts"] == []  # the press is detected after 60'
     assert s["minute"] == 51 and s["period"] == 2
 

@@ -1,5 +1,6 @@
 import type { Audience, Language, MatchSummary } from './api/types'
 import { EventFeed } from './components/EventFeed'
+import { MomentumChart } from './components/MomentumChart'
 import { clockLabel } from './format'
 import { useReplay } from './hooks/useReplay'
 
@@ -103,12 +104,7 @@ export function MatchView(props: Props) {
 
       <div className="grid">
         <div className="column">
-          <section className="card">
-            <h2>Momentum</h2>
-            <p className="muted">
-              Chart comes in step 2 · {replay.snapshot?.momentum.length ?? 0} points loaded
-            </p>
-          </section>
+          <MomentumChart snapshot={replay.snapshot} home={match.home} away={match.away} />
           <EventFeed
             events={replay.events}
             tags={replay.tags}
