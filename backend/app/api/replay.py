@@ -2,7 +2,9 @@
 
 Server -> client messages:
   {"type": "control", "t", "speed", "paused", "duration_s"}  on connect and after every command
-  {"type": "tick", "t", "minute", "period", "score", "events", "new_alerts"}  while playing
+  {"type": "tick", "t", "minute", "period", "score", "events", "new_alerts", "new_tags"}  while playing
+     (new_tags: key-event labels revealed in this tick, possibly for events sent earlier,
+      e.g. a pass becomes a key pass when the shot happens)
   {"type": "end", "t", "score"}  when the final whistle is reached (replay pauses, seek still works)
   {"type": "error", "detail"}
 Client -> server: {"action": "pause" | "play"}, {"action": "seek", "t": 3600},
@@ -33,6 +35,10 @@ def tick_payload(match_id: str, prev_t: float, t: float) -> dict:
     # Alerts are visible from the whole minute they were raised (as in /state).
     alerts, _ = service._minute_products(match_id, float(int(t // 60) * 60))
     seen_until = float(int(prev_t // 60) * 60)
+    new_tags: dict[str, list[str]] = {}
+    for tag in service.key_tags(match_id):
+        if prev_t <= tag.revealed_s < t and tag.tag not in new_tags.get(tag.event_id, []):
+            new_tags.setdefault(tag.event_id, []).append(tag.tag)
     return {
         "type": "tick",
         "t": t,
@@ -41,6 +47,7 @@ def tick_payload(match_id: str, prev_t: float, t: float) -> dict:
         "score": service.score(events, teams, t),
         "events": [e.model_dump(mode="json") for e in new_events],
         "new_alerts": [a.model_dump(mode="json") for a in alerts if a.first_detected_s > seen_until],
+        "new_tags": new_tags,
     }
 
 

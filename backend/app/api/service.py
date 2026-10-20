@@ -19,13 +19,17 @@ from app.stats import (
     GoalTurningPoint,
     WindowStats,
     compute_window,
+    KeyEventTag,
     goal_turning_points,
+    key_event_tags,
     rolling_windows,
     score,
+    visible_tags,
 )
 
 DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "matches"
 RECENT_EVENTS = 30
+KEY_EVENTS = 50  # most recent key events sent with every state
 STATS_WINDOW_S = 300.0
 ALERT_LINK_S = 600.0  # alerts confirmed within 10 minutes before a goal are linked (timing only)
 
@@ -64,6 +68,8 @@ class MatchState(BaseModel):
     period: int | None
     score: dict[str, int]
     recent_events: list[dict]  # newest last
+    key_events: list[dict]  # last KEY_EVENTS labelled events, newest last (may overlap recent_events)
+    event_tags: dict[str, list[str]]  # labels visible at t, for events in both lists
     window: WindowStats  # last 5 minutes before t
     totals: WindowStats  # kick-off to t
     momentum: list[MomentumPoint]  # per completed minute
@@ -101,6 +107,13 @@ def events_before(match: Match, t: float) -> list:
     return match.events[: bisect_left(timestamps, t)]
 
 
+@lru_cache(maxsize=None)
+def key_tags(match_id: str) -> tuple[KeyEventTag, ...]:
+    """All key-event labels for a match; callers filter by revealed_s < t (no future)."""
+    match = load_match(match_id)
+    return tuple(key_event_tags(match.events, teams_of(match)))
+
+
 @lru_cache(maxsize=4096)
 def _minute_products(match_id: str, minute_end_s: float) -> tuple[list[Alert], list[MomentumPoint]]:
     match = load_match(match_id)
@@ -125,6 +138,10 @@ def state_at(match_id: str, t: float) -> MatchState:
     events = events_before(match, t)
     period = next((e.period for e in reversed(events) if e.event_type == "period_start"), None)
     alerts, momentum = _minute_products(match_id, float(int(t // 60) * 60))
+    tags = visible_tags(key_tags(match_id), t)
+    recent = events[-RECENT_EVENTS:]
+    key = [e for e in events if e.event_id in tags][-KEY_EVENTS:]
+    shown = {e.event_id for e in recent} | {e.event_id for e in key}
 
     return MatchState(
         match_id=match_id,
@@ -132,7 +149,9 @@ def state_at(match_id: str, t: float) -> MatchState:
         minute=match_minute(t),
         period=period,
         score=score(events, teams, t),
-        recent_events=[e.model_dump(mode="json") for e in events[-RECENT_EVENTS:]],
+        recent_events=[e.model_dump(mode="json") for e in recent],
+        key_events=[e.model_dump(mode="json") for e in key],
+        event_tags={event_id: labels for event_id, labels in tags.items() if event_id in shown},
         window=compute_window(events, teams, max(0.0, t - STATS_WINDOW_S), t),
         totals=compute_window(events, teams, 0.0, t),
         momentum=momentum,
