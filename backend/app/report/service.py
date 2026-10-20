@@ -36,7 +36,9 @@ class ReportService:
         if cached is not None:
             return ReportResponse(report=cached, cached=True, facts=facts)
         template = await generate_report(facts, audience, language, None)
-        template = template.model_copy(update={"fallback_reason": "not_generated_yet"})
+        # The demo ships template-only reports: AI drafts passed the number checks but still had
+        # meaning errors (wrong pitch third, pressure on the wrong team) that no checker catches.
+        template = template.model_copy(update={"fallback_reason": "template_by_design"})
         return ReportResponse(report=template, cached=False, facts=facts)
 
 

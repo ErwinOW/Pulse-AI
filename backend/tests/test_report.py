@@ -135,7 +135,7 @@ def test_report_is_only_available_at_full_time(reports):
 
     assert get_report(end - 600).status_code == 409
     body = get_report(end, audience="analyst", language="id").json()
-    assert body["report"]["source"] == "fallback" and body["report"]["fallback_reason"] == "not_generated_yet"
+    assert body["report"]["source"] == "fallback" and body["report"]["fallback_reason"] == "template_by_design"
     assert body["facts"]["final_score"] == "1-1"
 
 
@@ -153,13 +153,14 @@ def test_bad_parameters_are_rejected(reports):
     assert get_report(9999, match_id="nope").status_code == 404
 
 
-def test_committed_report_cache_covers_the_demo_match():
-    # Freshness: the shipped reports must match today's fact sheet (generate with run_live_reports --save).
+def test_shipped_demo_serves_template_reports_only():
+    # Decision: no AI reports are shipped (meaning errors the checker can't catch), so the committed
+    # cache is empty and every version is the labelled template that passes the checker.
     service = ReportService()
     app.dependency_overrides[get_report_service] = lambda: service
     try:
         for audience, language in COMBOS:
             body = get_report(end_time(DEMO), audience=audience, language=language).json()
-            assert body["cached"] is True, f"{audience}/{language} not cached"
+            assert body["cached"] is False and body["report"]["source"] == "fallback", f"{audience}/{language}"
     finally:
         app.dependency_overrides.clear()
